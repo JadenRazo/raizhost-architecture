@@ -1,0 +1,79 @@
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Inter, Segoe UI, Helvetica, Arial, sans-serif", "fontSize": "14px", "primaryColor": "#eef2ff", "primaryBorderColor": "#4f46e5", "primaryTextColor": "#111827", "lineColor": "#6b7280", "clusterBkg": "#f9fafb", "clusterBorder": "#d1d5db", "edgeLabelBackground": "#ffffff"}, "flowchart": {"curve": "basis", "nodeSpacing": 28, "rankSpacing": 44}}}%%
+flowchart TB
+  classDef edge fill:#fff7ed,stroke:#ea580c,color:#111827
+  classDef aws fill:#eef2ff,stroke:#4f46e5,color:#111827
+  classDef data fill:#ecfdf5,stroke:#059669,color:#111827
+  classDef saas fill:#fdf2f8,stroke:#db2777,color:#111827
+  classDef ops fill:#f1f5f9,stroke:#475569,color:#111827
+
+  visitors(["Visitors · clients · prospects"])
+
+  subgraph EDGE["Edge — Cloudflare + CloudFront"]
+    direction LR
+    cfdns["Cloudflare DNS<br/>DNS-only CNAMEs, DNSSEC,<br/>email routing"]:::edge
+    cf["CloudFront ×10<br/>PriceClass_100 · ACM TLS<br/>CloudFront Functions:<br/>canonical URLs + bot block"]:::aws
+  end
+
+  subgraph STATIC["Static surfaces — S3 origins (OAC)"]
+    direction LR
+    mkt["raizhost.com<br/>Astro marketing site"]:::aws
+    demos["demos.raizhost.com<br/>demo factory"]:::aws
+    sites["Hosted client sites<br/>(the product)"]:::aws
+    status["status.raizhost.com"]:::aws
+  end
+
+  subgraph APPS["Dynamic apps — scale-to-zero"]
+    direction LR
+    apigw["HTTP API Gateway ×9<br/>CORS + stage throttling"]:::aws
+    lambdas["Lambda ×17 · arm64<br/>container web apps (Next.js + Web Adapter)<br/>Go/Rust zip APIs · Node pollers"]:::aws
+    llm["llm.raizhost.com<br/>LLM Tracker"]:::aws
+    quotes["quotes + sales-crm APIs"]:::aws
+  end
+
+  subgraph ANCHOR["The anchor — one always-on box"]
+    direction LR
+    ec2["EC2 t4g.medium (Graviton)<br/>Postgres + PgBouncer + Redis<br/>NAT for in-VPC Lambdas<br/>app.raizhost.com portal container"]:::aws
+  end
+
+  subgraph DATA["Data & state"]
+    direction LR
+    ddb[("DynamoDB ×2<br/>on-demand · PITR")]:::data
+    s3["S3 ×15<br/>sites · assets · backups<br/>tfstate · signed contracts"]:::data
+    secrets["Secrets Manager"]:::data
+  end
+
+  subgraph OPS["Operate — CI/CD, scheduling, observability"]
+    direction LR
+    gha["GitHub Actions<br/>OIDC role assumption<br/>(no stored keys)"]:::ops
+    ecr["ECR ×7<br/>keep-last-5"]:::ops
+    ssm["SSM Session Manager<br/>+ RunCommand deploys<br/>(no open SSH)"]:::ops
+    sched["EventBridge Scheduler ×11<br/>pollers · crons ·<br/>opsbox stop/start"]:::ops
+    cw["CloudWatch alarms<br/>Route 53 health checks<br/>→ SNS email"]:::ops
+    tf["Terraform ~330 resources<br/>+ gated provisioning scripts"]:::ops
+  end
+
+  subgraph SAAS["External services"]
+    direction LR
+    stripe["Stripe<br/>subscriptions + payment links"]:::saas
+    signwell["SignWell<br/>e-signature"]:::saas
+    resend["Resend<br/>transactional email"]:::saas
+  end
+
+  visitors --> cfdns --> cf
+  cf --> mkt & demos & sites & status
+  cf --> apigw --> lambdas
+  lambdas --> llm & quotes
+  cf -->|"app.raizhost.com"| ec2
+  lambdas --> ec2
+  lambdas --> ddb
+  lambdas --> secrets
+  ec2 -->|"publish sites"| s3
+  ec2 -->|"nightly pg_dumpall"| s3
+  sched --> lambdas
+  gha -->|"s3 sync + invalidate"| s3
+  gha -->|"arm64 image"| ecr --> ssm --> ec2
+  ecr --> lambdas
+  cw -.-> cf & lambdas & ec2
+  tf -.-> cf & apigw & ec2 & s3
+  ec2 --> stripe & signwell & resend
+  quotes --> resend

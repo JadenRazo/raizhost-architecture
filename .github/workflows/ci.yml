@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  docs:
+    name: lint markdown + render diagram
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: |
+            **/*.md
+            !node_modules
+
+      - name: Render Mermaid source (fails on syntax errors)
+        uses: docker://minlag/mermaid-cli:11.4.2
+        with:
+          args: -i diagrams/architecture.mmd -o /tmp/architecture.svg -b transparent
+
+      - name: Check for private identifiers
+        run: |
+          set -euo pipefail
+          if grep -rnE '\b[0-9]{12}\b|\bi-0[0-9a-f]{8,}\b|\bE[0-9A-Z]{13}\b|\b[0-9]{1,3}(\.[0-9]{1,3}){3}\b|raizcloud-|arn:aws' --include='*.md' --include='*.mmd' . ; then
+            echo "::error::private identifier pattern found"; exit 1
+          fi
+          echo "clean"
