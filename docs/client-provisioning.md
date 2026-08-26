@@ -3,7 +3,7 @@
 Going live for a new client used to be ~12 console steps. It is now one command that plans by
 default and mutates only on `--execute`, which trips the operations guard's approval prompt.
 
-```
+```text
 node infra/new-client-site.mjs --slug <slug> --domain <domain> [--no-www] [--no-dns] [--execute]
 ```
 
@@ -53,7 +53,7 @@ sequenceDiagram
 
 ## After launch: content updates
 
-```
+```text
 node infra/site-update.mjs <slug> [--execute] [--allow-delete]
 ```
 
