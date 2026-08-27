@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 960" width="1440" height="960" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 980" width="1440" height="980" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
   <title id="t">RaizHost cloud architecture</title>
   <desc id="d">Cloudflare DNS in front of ten CloudFront distributions. Static sites are served from S3; dynamic apps run on HTTP API Gateway and arm64 Lambda; one Graviton EC2 anchor runs Postgres, PgBouncer, Redis, NAT and the client portal. DynamoDB, S3 and Secrets Manager hold state. GitHub Actions deploys via OIDC through ECR and SSM; EventBridge Scheduler, CloudWatch and Route 53 health checks operate it. Stripe, SignWell and Resend are external services.</desc>
   <defs>
@@ -20,180 +20,188 @@
       .l{fill:none;stroke:#64748b;stroke-width:1.5;marker-end:url(#ah)}
       .ld{fill:none;stroke:#94a3b8;stroke-width:1.3;stroke-dasharray:5 4;marker-end:url(#ahd)}
       .lbl{font-size:11px;fill:#475569}
-      .lblbg{fill:#ffffff}
     </style>
   </defs>
-  <rect width="1440" height="960" fill="#ffffff"/>
+  <rect width="1440" height="980" fill="#ffffff"/>
 
-  <!-- Visitors -->
-  <rect x="440" y="24" width="260" height="42" rx="21" fill="#0f172a"/>
-  <text x="570" y="50" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">Visitors · clients · prospects</text>
+  <!-- ===== Visitors ===== -->
+  <rect x="80" y="24" width="260" height="40" rx="20" fill="#0f172a"/>
+  <text x="210" y="49" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">Visitors · clients · prospects</text>
 
-  <!-- EDGE band -->
-  <rect class="band" x="40" y="100" width="1040" height="132"/>
+  <!-- ===== EDGE band (y 100–232) ===== -->
+  <rect class="band" x="40" y="100" width="900" height="132"/>
   <text class="bandt" x="56" y="122">Edge — Cloudflare + CloudFront</text>
   <rect class="box edge" x="80" y="140" width="260" height="72"/>
   <text class="h" x="210" y="164" text-anchor="middle">Cloudflare DNS</text>
   <text class="s" x="210" y="182" text-anchor="middle">DNS-only CNAMEs · DNSSEC · email routing</text>
   <text class="m" x="210" y="198" text-anchor="middle">no Route 53 hosted zones</text>
-  <rect class="box aws" x="420" y="132" width="440" height="88"/>
-  <text class="h" x="640" y="156" text-anchor="middle">CloudFront ×10 · ACM TLS · PriceClass_100</text>
-  <text class="s" x="640" y="176" text-anchor="middle">one distribution per public hostname</text>
-  <text class="s" x="640" y="194" text-anchor="middle">CloudFront Functions: canonical URLs · index rewrite · bot block</text>
-  <text class="m" x="640" y="210" text-anchor="middle">per-behavior cache policies · s-maxage edge caching</text>
+  <rect class="box aws" x="420" y="132" width="480" height="88"/>
+  <text class="h" x="660" y="156" text-anchor="middle">CloudFront ×10 · ACM TLS · PriceClass_100</text>
+  <text class="s" x="660" y="176" text-anchor="middle">one distribution per public hostname</text>
+  <text class="s" x="660" y="194" text-anchor="middle">CloudFront Functions: canonical URLs · index rewrite · bot block</text>
+  <text class="m" x="660" y="210" text-anchor="middle">per-behavior cache policies · s-maxage edge caching</text>
 
-  <!-- STATIC band -->
-  <rect class="band" x="40" y="286" width="480" height="176"/>
-  <text class="bandt" x="56" y="308">Static surfaces — S3 origins via OAC</text>
-  <rect class="box aws" x="68" y="326" width="208" height="52"/>
-  <text class="h" x="172" y="347" text-anchor="middle">raizhost.com</text>
-  <text class="s" x="172" y="365" text-anchor="middle">Astro marketing site</text>
-  <rect class="box aws" x="292" y="326" width="208" height="52"/>
-  <text class="h" x="396" y="347" text-anchor="middle">demos.raizhost.com</text>
-  <text class="s" x="396" y="365" text-anchor="middle">demo factory (noindex)</text>
-  <rect class="box aws" x="68" y="392" width="208" height="52"/>
-  <text class="h" x="172" y="413" text-anchor="middle">Hosted client sites</text>
-  <text class="s" x="172" y="431" text-anchor="middle">the product · one dist per client</text>
-  <rect class="box aws" x="292" y="392" width="208" height="52"/>
-  <text class="h" x="396" y="413" text-anchor="middle">status.raizhost.com</text>
-  <text class="s" x="396" y="431" text-anchor="middle">public status page</text>
+  <!-- ===== STATIC band (y 300–476) ===== -->
+  <rect class="band" x="40" y="300" width="460" height="176"/>
+  <text class="bandt" x="56" y="322">Static surfaces — S3 origins via OAC</text>
+  <rect class="box aws" x="64" y="340" width="200" height="52"/>
+  <text class="h" x="164" y="361" text-anchor="middle">raizhost.com</text>
+  <text class="s" x="164" y="379" text-anchor="middle">Astro marketing site</text>
+  <rect class="box aws" x="276" y="340" width="200" height="52"/>
+  <text class="h" x="376" y="361" text-anchor="middle">demos.raizhost.com</text>
+  <text class="s" x="376" y="379" text-anchor="middle">demo factory (noindex)</text>
+  <rect class="box aws" x="64" y="406" width="200" height="52"/>
+  <text class="h" x="164" y="427" text-anchor="middle">Hosted client sites</text>
+  <text class="s" x="164" y="445" text-anchor="middle">the product · one dist each</text>
+  <rect class="box aws" x="276" y="406" width="200" height="52"/>
+  <text class="h" x="376" y="427" text-anchor="middle">status.raizhost.com</text>
+  <text class="s" x="376" y="445" text-anchor="middle">public status page</text>
 
-  <!-- DYNAMIC band -->
-  <rect class="band" x="560" y="286" width="490" height="176"/>
-  <text class="bandt" x="576" y="308">Dynamic apps — scale-to-zero</text>
-  <rect class="box aws" x="584" y="336" width="180" height="70"/>
-  <text class="h" x="674" y="361" text-anchor="middle">HTTP API Gateway ×9</text>
-  <text class="s" x="674" y="379" text-anchor="middle">CORS · stage throttling</text>
-  <text class="m" x="674" y="395" text-anchor="middle">pay-per-request, no ALB</text>
-  <rect class="box aws" x="800" y="322" width="230" height="122"/>
-  <text class="h" x="915" y="345" text-anchor="middle">Lambda ×17 · arm64</text>
-  <text class="s" x="915" y="365" text-anchor="middle">Next.js containers + Web Adapter</text>
-  <text class="s" x="915" y="381" text-anchor="middle">Go / Rust zip APIs · Node pollers</text>
-  <text class="m" x="915" y="402" text-anchor="middle">llm.raizhost.com · tenant apps</text>
-  <text class="m" x="915" y="418" text-anchor="middle">quote capture · sales CRM</text>
-  <text class="m" x="915" y="434" text-anchor="middle">in-VPC when they need Postgres</text>
+  <!-- ===== DYNAMIC band (y 300–476) ===== -->
+  <rect class="band" x="540" y="300" width="500" height="176"/>
+  <text class="bandt" x="556" y="322">Dynamic apps — scale-to-zero</text>
+  <rect class="box aws" x="564" y="350" width="180" height="70"/>
+  <text class="h" x="654" y="375" text-anchor="middle">HTTP API Gateway ×9</text>
+  <text class="s" x="654" y="393" text-anchor="middle">CORS · stage throttling</text>
+  <text class="m" x="654" y="409" text-anchor="middle">pay-per-request, no ALB</text>
+  <rect class="box aws" x="784" y="336" width="232" height="122"/>
+  <text class="h" x="900" y="359" text-anchor="middle">Lambda ×17 · arm64</text>
+  <text class="s" x="900" y="379" text-anchor="middle">Next.js containers + Web Adapter</text>
+  <text class="s" x="900" y="395" text-anchor="middle">Go / Rust zip APIs · Node pollers</text>
+  <text class="m" x="900" y="416" text-anchor="middle">llm.raizhost.com · tenant apps</text>
+  <text class="m" x="900" y="432" text-anchor="middle">quote capture · sales CRM</text>
+  <text class="m" x="900" y="448" text-anchor="middle">in-VPC when they need Postgres</text>
 
-  <!-- DATA band -->
-  <rect class="band" x="40" y="516" width="480" height="160"/>
-  <text class="bandt" x="56" y="538">Data &amp; state</text>
-  <path class="data" stroke-width="1.4" d="M70 566a60 9 0 0 1 120 0v70a60 9 0 0 1 -120 0z"/>
-  <path d="M70 566a60 9 0 0 0 120 0" fill="none" stroke="#059669" stroke-width="1.4"/>
-  <text class="h" x="130" y="596" text-anchor="middle">DynamoDB ×2</text>
-  <text class="s" x="130" y="614" text-anchor="middle">on-demand · PITR</text>
-  <text class="m" x="130" y="630" text-anchor="middle">quotes · CRM</text>
-  <rect class="box data" x="216" y="556" width="164" height="90"/>
-  <text class="h" x="298" y="580" text-anchor="middle">S3 ×15</text>
-  <text class="s" x="298" y="598" text-anchor="middle">site origins · assets</text>
-  <text class="s" x="298" y="614" text-anchor="middle">backups · tfstate</text>
-  <text class="m" x="298" y="632" text-anchor="middle">signed contracts (versioned)</text>
-  <rect class="box data" x="396" y="556" width="104" height="90"/>
-  <text class="h" x="448" y="592" text-anchor="middle">Secrets</text>
-  <text class="h" x="448" y="609" text-anchor="middle">Manager</text>
-  <text class="m" x="448" y="630" text-anchor="middle">×10</text>
+  <!-- ===== DATA band (y 540–700) ===== -->
+  <rect class="band" x="40" y="540" width="460" height="160"/>
+  <text class="bandt" x="56" y="562">Data &amp; state</text>
+  <path class="data" stroke-width="1.4" d="M64 590a58 9 0 0 1 116 0v70a58 9 0 0 1 -116 0z"/>
+  <path d="M64 590a58 9 0 0 0 116 0" fill="none" stroke="#059669" stroke-width="1.4"/>
+  <text class="h" x="122" y="620" text-anchor="middle">DynamoDB ×2</text>
+  <text class="s" x="122" y="638" text-anchor="middle">on-demand · PITR</text>
+  <text class="m" x="122" y="654" text-anchor="middle">quotes · CRM</text>
+  <rect class="box data" x="204" y="580" width="164" height="90"/>
+  <text class="h" x="286" y="604" text-anchor="middle">S3 ×15</text>
+  <text class="s" x="286" y="622" text-anchor="middle">site origins · assets</text>
+  <text class="s" x="286" y="638" text-anchor="middle">backups · tfstate</text>
+  <text class="m" x="286" y="656" text-anchor="middle">signed contracts (versioned)</text>
+  <rect class="box data" x="384" y="580" width="92" height="90"/>
+  <text class="h" x="430" y="616" text-anchor="middle">Secrets</text>
+  <text class="h" x="430" y="633" text-anchor="middle">Manager</text>
+  <text class="m" x="430" y="654" text-anchor="middle">×10</text>
 
-  <!-- ANCHOR band -->
-  <rect class="band" x="560" y="516" width="490" height="160"/>
-  <text class="bandt" x="576" y="538">The anchor — the only always-on compute</text>
-  <rect class="box aws" x="584" y="552" width="442" height="104"/>
-  <text class="h" x="805" y="576" text-anchor="middle">EC2 t4g.medium (Graviton) · ~$25/mo all-in</text>
-  <text class="s" x="805" y="597" text-anchor="middle">Postgres (many DBs) + PgBouncer · Redis</text>
-  <text class="s" x="805" y="614" text-anchor="middle">NAT for private Lambda subnets (no NAT Gateway)</text>
-  <text class="s" x="805" y="631" text-anchor="middle">app.raizhost.com portal — Docker, behind CloudFront</text>
-  <text class="m" x="805" y="648" text-anchor="middle">SSM access only · nightly pg_dumpall → S3 · daily EBS snapshots</text>
+  <!-- ===== ANCHOR band (y 540–700) ===== -->
+  <rect class="band" x="540" y="540" width="500" height="160"/>
+  <text class="bandt" x="556" y="562">The anchor — the only always-on compute</text>
+  <rect class="box aws" x="564" y="578" width="452" height="102"/>
+  <text class="h" x="790" y="602" text-anchor="middle">EC2 t4g.medium (Graviton) · ~$25/mo all-in</text>
+  <text class="s" x="790" y="622" text-anchor="middle">Postgres (many DBs) + PgBouncer · Redis</text>
+  <text class="s" x="790" y="639" text-anchor="middle">NAT for private Lambda subnets (no NAT Gateway)</text>
+  <text class="s" x="790" y="656" text-anchor="middle">app.raizhost.com portal — Docker, behind CloudFront</text>
+  <text class="m" x="790" y="673" text-anchor="middle">SSM access only · nightly pg_dumpall → S3 · daily EBS snapshots</text>
 
-  <!-- OPERATE column -->
-  <rect class="band" x="1100" y="100" width="300" height="576"/>
-  <text class="bandt" x="1116" y="122">Operate — CI/CD · scheduling · alarms</text>
-  <rect class="box ops" x="1124" y="140" width="252" height="64"/>
-  <text class="h" x="1250" y="162" text-anchor="middle">GitHub Actions</text>
-  <text class="s" x="1250" y="180" text-anchor="middle">OIDC role assumption · no stored keys</text>
-  <text class="m" x="1250" y="196" text-anchor="middle">CI gate → deploy on merge to main</text>
-  <rect class="box ops" x="1124" y="228" width="252" height="48"/>
-  <text class="h" x="1250" y="248" text-anchor="middle">ECR ×7 · arm64 images</text>
-  <text class="s" x="1250" y="266" text-anchor="middle">keep-last-5 lifecycle</text>
-  <rect class="box ops" x="1124" y="300" width="252" height="64"/>
-  <text class="h" x="1250" y="322" text-anchor="middle">SSM Session Manager + RunCommand</text>
-  <text class="s" x="1250" y="340" text-anchor="middle">health-gated deploy.sh · auto-rollback</text>
-  <text class="m" x="1250" y="356" text-anchor="middle">no open SSH anywhere</text>
-  <rect class="box ops" x="1124" y="388" width="252" height="64"/>
-  <text class="h" x="1250" y="410" text-anchor="middle">EventBridge Scheduler ×11</text>
-  <text class="s" x="1250" y="428" text-anchor="middle">pollers · nightly jobs</text>
-  <text class="m" x="1250" y="444" text-anchor="middle">ops-box stop/start schedule</text>
-  <rect class="box ops" x="1124" y="476" width="252" height="80"/>
-  <text class="h" x="1250" y="498" text-anchor="middle">CloudWatch + Route 53 health checks</text>
-  <text class="s" x="1250" y="516" text-anchor="middle">uptime · Lambda errors · CF 5xx · EC2 recover</text>
-  <text class="s" x="1250" y="532" text-anchor="middle">→ SNS email · 14-day logs</text>
-  <text class="m" x="1250" y="548" text-anchor="middle">2× AWS Budgets at the $100 ceiling</text>
-  <rect class="box ops" x="1124" y="580" width="252" height="80"/>
-  <text class="h" x="1250" y="602" text-anchor="middle">Terraform ~330 resources</text>
-  <text class="s" x="1250" y="620" text-anchor="middle">S3 backend · per-account guard</text>
-  <text class="s" x="1250" y="636" text-anchor="middle">+ gated provisioning scripts</text>
-  <text class="m" x="1250" y="652" text-anchor="middle">plan by default · --execute needs approval</text>
+  <!-- ===== OPERATE column (x 1120–1400, y 100–700) ===== -->
+  <rect class="band" x="1120" y="100" width="280" height="600"/>
+  <text class="bandt" x="1136" y="122">Operate — CI/CD · ops</text>
+  <rect class="box ops" x="1140" y="140" width="240" height="66"/>
+  <text class="h" x="1260" y="162" text-anchor="middle">GitHub Actions</text>
+  <text class="s" x="1260" y="180" text-anchor="middle">OIDC roles · no stored keys</text>
+  <text class="m" x="1260" y="196" text-anchor="middle">CI gate → deploy on merge</text>
+  <rect class="box ops" x="1140" y="232" width="240" height="50"/>
+  <text class="h" x="1260" y="253" text-anchor="middle">ECR ×7 · arm64 images</text>
+  <text class="s" x="1260" y="271" text-anchor="middle">keep-last-5 lifecycle</text>
+  <rect class="box ops" x="1140" y="308" width="240" height="66"/>
+  <text class="h" x="1260" y="330" text-anchor="middle">SSM RunCommand deploys</text>
+  <text class="s" x="1260" y="348" text-anchor="middle">health-gated · auto-rollback</text>
+  <text class="m" x="1260" y="364" text-anchor="middle">Session Manager · no open SSH</text>
+  <rect class="box ops" x="1140" y="400" width="240" height="66"/>
+  <text class="h" x="1260" y="422" text-anchor="middle">EventBridge Scheduler ×11</text>
+  <text class="s" x="1260" y="440" text-anchor="middle">pollers · nightly jobs</text>
+  <text class="m" x="1260" y="456" text-anchor="middle">ops-box stop/start schedule</text>
+  <rect class="box ops" x="1140" y="492" width="240" height="82"/>
+  <text class="h" x="1260" y="514" text-anchor="middle">CloudWatch · Route 53 checks</text>
+  <text class="s" x="1260" y="532" text-anchor="middle">uptime · Lambda errors · CF 5xx</text>
+  <text class="s" x="1260" y="548" text-anchor="middle">EC2 self-heal → SNS email</text>
+  <text class="m" x="1260" y="564" text-anchor="middle">14-day logs · 2× Budgets at $100</text>
+  <rect class="box ops" x="1140" y="600" width="240" height="82"/>
+  <text class="h" x="1260" y="622" text-anchor="middle">Terraform ~330 resources</text>
+  <text class="s" x="1260" y="640" text-anchor="middle">S3 backend · per-account guard</text>
+  <text class="s" x="1260" y="656" text-anchor="middle">+ gated provisioning scripts</text>
+  <text class="m" x="1260" y="672" text-anchor="middle">plan by default · --execute to apply</text>
 
-  <!-- EXTERNAL band -->
-  <rect class="band" x="40" y="730" width="1360" height="110"/>
-  <text class="bandt" x="56" y="752">External services</text>
-  <rect class="box saas" x="80" y="772" width="220" height="50"/>
-  <text class="h" x="190" y="793" text-anchor="middle">Stripe</text>
-  <text class="s" x="190" y="810" text-anchor="middle">subscriptions · payment links</text>
-  <rect class="box saas" x="330" y="772" width="220" height="50"/>
-  <text class="h" x="440" y="793" text-anchor="middle">SignWell</text>
-  <text class="s" x="440" y="810" text-anchor="middle">e-signature before payment</text>
-  <rect class="box saas" x="580" y="772" width="220" height="50"/>
-  <text class="h" x="690" y="793" text-anchor="middle">Resend</text>
-  <text class="s" x="690" y="810" text-anchor="middle">transactional email</text>
-  <rect class="box legacy" x="1000" y="772" width="376" height="50"/>
-  <text class="h" x="1188" y="793" text-anchor="middle" fill="#52525b">Hetzner VPS — legacy shadow</text>
-  <text class="s" x="1188" y="810" text-anchor="middle" fill="#71717a">read-only rollback backstop · being retired</text>
+  <!-- ===== EXTERNAL band (y 770–880) ===== -->
+  <rect class="band" x="40" y="770" width="1360" height="110"/>
+  <text class="bandt" x="56" y="792">External services</text>
+  <rect class="box saas" x="80" y="812" width="220" height="50"/>
+  <text class="h" x="190" y="833" text-anchor="middle">Stripe</text>
+  <text class="s" x="190" y="850" text-anchor="middle">subscriptions · payment links</text>
+  <rect class="box saas" x="330" y="812" width="220" height="50"/>
+  <text class="h" x="440" y="833" text-anchor="middle">SignWell</text>
+  <text class="s" x="440" y="850" text-anchor="middle">e-signature before payment</text>
+  <rect class="box saas" x="580" y="812" width="220" height="50"/>
+  <text class="h" x="690" y="833" text-anchor="middle">Resend</text>
+  <text class="s" x="690" y="850" text-anchor="middle">transactional email</text>
+  <rect class="box legacy" x="1000" y="812" width="380" height="50"/>
+  <text class="h" x="1190" y="833" text-anchor="middle" fill="#52525b">Hetzner VPS — legacy shadow</text>
+  <text class="s" x="1190" y="850" text-anchor="middle" fill="#71717a">read-only rollback backstop · being retired</text>
 
-  <!-- EDGES -->
-  <path class="l" d="M480 66 L 250 66 L 250 140"/>
+  <!-- ===== EDGES (orthogonal only) ===== -->
+  <!-- visitors → DNS → CloudFront -->
+  <path class="l" d="M210 64 L 210 140"/>
   <path class="l" d="M340 176 L 420 176"/>
-  <path class="l" d="M520 220 L 300 286"/>
-  <path class="l" d="M674 220 L 674 336"/>
-  <path class="l" d="M560 220 L 540 220 L 540 640 L 584 640"/>
-  <path class="l" d="M764 371 L 800 371"/>
-  <path class="l" d="M915 444 L 915 552"/>
-  <path class="l" d="M830 444 L 830 488 L 130 488 L 130 562"/>
-  <path class="l" d="M448 488 L 448 556"/>
-  <path class="l" d="M584 650 L 298 650 L 298 646"/>
-  <path class="l" d="M700 656 L 700 704 L 190 704 L 190 772"/>
-  <path class="l" d="M440 704 L 440 772"/>
-  <path class="l" d="M690 704 L 690 772"/>
-  <path class="l" d="M1250 204 L 1250 228"/>
-  <path class="l" d="M1250 276 L 1250 300"/>
-  <path class="l" d="M1124 252 L 1064 252 L 1064 371 L 1030 371"/>
-  <path class="l" d="M1124 340 L 1090 340 L 1090 620 L 1026 620"/>
-  <path class="l" d="M1124 420 L 1030 420"/>
-  <path class="ld" d="M1124 500 L 1026 566"/>
-  <path class="ld" d="M1124 640 L 1026 648"/>
-  <path class="l" d="M1124 172 L 1084 172 L 1084 262 L 396 262 L 396 326"/>
+  <!-- CloudFront → static band (cache miss) -->
+  <path class="l" d="M460 220 L 460 300"/>
+  <text class="lbl" x="468" y="266">static sites (cache miss only)</text>
+  <!-- CloudFront → API Gateway -->
+  <path class="l" d="M654 220 L 654 350"/>
+  <!-- CloudFront → anchor portal, via the right-hand bus (x=1060) -->
+  <path class="l" d="M900 160 L 1060 160 L 1060 600 L 1016 600"/>
+  <text class="lbl" x="980" y="152" text-anchor="middle">app.raizhost.com</text>
+  <!-- API Gateway → Lambda -->
+  <path class="l" d="M744 385 L 784 385"/>
+  <!-- Lambda → anchor Postgres -->
+  <path class="l" d="M900 458 L 900 578"/>
+  <text class="lbl" x="908" y="522">Postgres via PgBouncer</text>
+  <!-- Lambda → DynamoDB + Secrets, via the inter-band channel (y=508) -->
+  <path class="l" d="M820 458 L 820 508 L 122 508 L 122 586"/>
+  <path class="l" d="M430 508 L 430 580"/>
+  <text class="lbl" x="600" y="500" text-anchor="middle">key-value data · secrets</text>
+  <!-- anchor → S3 (publish + backups), below the data boxes -->
+  <path class="l" d="M620 680 L 620 692 L 286 692 L 286 670"/>
+  <text class="lbl" x="440" y="683" text-anchor="middle">publish sites · nightly pg_dumpall</text>
+  <!-- anchor → external services -->
+  <path class="l" d="M690 680 L 690 740 L 190 740 L 190 812"/>
+  <path class="l" d="M440 740 L 440 812"/>
+  <path class="l" d="M690 740 L 690 812"/>
+  <text class="lbl" x="708" y="762">billing · contracts · mail (portal + quotes API)</text>
+  <!-- Operate column chain -->
+  <path class="l" d="M1260 206 L 1260 232"/>
+  <path class="l" d="M1260 282 L 1260 308"/>
+  <!-- GitHub Actions → S3 site origins (static deploys), via top-right channel -->
+  <path class="l" d="M1140 152 L 1104 152 L 1104 84 L 380 84 L 380 340"/>
+  <text class="lbl" x="820" y="78" text-anchor="middle">GitHub Actions deploys static sites: 4-pass s3 sync + CloudFront invalidation</text>
+  <!-- ECR → Lambda (bus x=1080) -->
+  <path class="l" d="M1140 257 L 1080 257 L 1080 385 L 1016 385"/>
+  <!-- SSM → anchor (bus x=1100) -->
+  <path class="l" d="M1140 341 L 1100 341 L 1100 640 L 1016 640"/>
+  <!-- EventBridge → Lambda -->
+  <path class="l" d="M1140 433 L 1016 433"/>
+  <!-- CloudWatch → anchor (control plane) -->
+  <path class="ld" d="M1140 533 L 1060 533 L 1060 660 L 1016 660"/>
+  <!-- Terraform → platform (control plane) -->
+  <path class="ld" d="M1140 641 L 1110 641 L 1110 722 L 790 722 L 790 680"/>
+  <text class="lbl" x="950" y="716" text-anchor="middle">Terraform manages the platform resources</text>
 
-  <!-- EDGE LABELS -->
-  <rect class="lblbg" x="1040" y="296" width="70" height="16" rx="3"/><text class="lbl" x="1075" y="308" text-anchor="middle">arm64 image</text>
-  <rect class="lblbg" x="1094" y="440" width="0" height="0"/>
-  <text class="lbl" x="1101" y="455" transform="rotate(-90 1101 455)" text-anchor="middle">SSM deploy</text>
-  <rect class="lblbg" x="1044" y="403" width="60" height="16" rx="3"/><text class="lbl" x="1074" y="415" text-anchor="middle">cron / poll</text>
-  <rect class="lblbg" x="1030" y="524" width="60" height="16" rx="3"/><text class="lbl" x="1060" y="536" text-anchor="middle">alarms</text>
-  <rect class="lblbg" x="1040" y="656" width="76" height="16" rx="3"/><text class="lbl" x="1078" y="668" text-anchor="middle">manages state</text>
-  <rect class="lblbg" x="660" y="254" width="176" height="16" rx="3"/><text class="lbl" x="748" y="266" text-anchor="middle">4-pass s3 sync + CloudFront invalidation</text>
-  <text class="lbl" x="528" y="430" transform="rotate(-90 528 430)" text-anchor="middle">app.raizhost.com → anchor portal</text>
-  <rect class="lblbg" x="924" y="490" width="120" height="16" rx="3"/><text class="lbl" x="984" y="502" text-anchor="middle">Postgres via PgBouncer</text>
-  <rect class="lblbg" x="560" y="480" width="150" height="16" rx="3"/><text class="lbl" x="635" y="492" text-anchor="middle">key-value data · secrets</text>
-  <rect class="lblbg" x="330" y="656" width="176" height="16" rx="3"/><text class="lbl" x="418" y="668" text-anchor="middle">publish sites · nightly pg_dumpall</text>
-  <rect class="lblbg" x="730" y="696" width="200" height="16" rx="3"/><text class="lbl" x="830" y="708" text-anchor="middle">billing · contracts · mail (portal + quotes API)</text>
-  <rect class="lblbg" x="380" y="232" width="150" height="16" rx="3"/><text class="lbl" x="455" y="244" text-anchor="middle">static sites (cache miss only)</text>
-
-  <!-- Legend -->
+  <!-- ===== Legend ===== -->
   <g font-size="11" fill="#475569">
-    <rect x="40" y="880" width="14" height="14" class="aws" rx="3"/><text x="60" y="891">AWS (us-east-1, one account)</text>
-    <rect x="230" y="880" width="14" height="14" class="edge" rx="3"/><text x="250" y="891">Cloudflare</text>
-    <rect x="330" y="880" width="14" height="14" class="data" rx="3"/><text x="350" y="891">State</text>
-    <rect x="410" y="880" width="14" height="14" class="ops" rx="3"/><text x="430" y="891">Operations</text>
-    <rect x="510" y="880" width="14" height="14" class="saas" rx="3"/><text x="530" y="891">External SaaS</text>
-    <line x1="630" y1="887" x2="670" y2="887" stroke="#64748b" stroke-width="1.5"/><text x="678" y="891">traffic / data</text>
-    <line x1="770" y1="887" x2="810" y2="887" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="5 4"/><text x="818" y="891">control plane</text>
+    <rect x="40" y="922" width="14" height="14" class="aws" rx="3"/><text x="60" y="933">AWS (us-east-1, one account)</text>
+    <rect x="230" y="922" width="14" height="14" class="edge" rx="3"/><text x="250" y="933">Cloudflare</text>
+    <rect x="330" y="922" width="14" height="14" class="data" rx="3"/><text x="350" y="933">State</text>
+    <rect x="410" y="922" width="14" height="14" class="ops" rx="3"/><text x="430" y="933">Operations</text>
+    <rect x="510" y="922" width="14" height="14" class="saas" rx="3"/><text x="530" y="933">External SaaS</text>
+    <line x1="630" y1="929" x2="670" y2="929" stroke="#64748b" stroke-width="1.5"/><text x="678" y="933">traffic / deploys</text>
+    <line x1="780" y1="929" x2="820" y2="929" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="5 4"/><text x="828" y="933">control plane</text>
   </g>
-  <text x="1400" y="891" text-anchor="end" font-size="12" font-weight="600" fill="#0f172a">Core platform ≈ $50/month · everything arm64 · idle cost ≈ $0</text>
-  <text x="1400" y="912" text-anchor="end" font-size="11" fill="#64748b">RaizHost architecture · August 2026 · github.com/JadenRazo/raizhost-architecture</text>
+  <text x="1400" y="933" text-anchor="end" font-size="12" font-weight="600" fill="#0f172a">Core platform ≈ $50/month · everything arm64 · idle cost ≈ $0</text>
+  <text x="1400" y="954" text-anchor="end" font-size="11" fill="#64748b">RaizHost architecture · August 2026 · github.com/JadenRazo/raizhost-architecture</text>
 </svg>
