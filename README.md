@@ -26,7 +26,7 @@ platform runs on, why each piece was chosen, what it costs, and how it is operat
   <img src="diagrams/architecture.svg" alt="RaizHost architecture: Cloudflare DNS in front of ten CloudFront distributions; static sites served from S3; dynamic apps on HTTP API Gateway and arm64 Lambda; a single Graviton EC2 anchor running Postgres, PgBouncer, Redis and the client portal; DynamoDB and S3 for state; GitHub Actions OIDC deploys through ECR and SSM; EventBridge Scheduler, CloudWatch and Route 53 health checks for operations; Stripe, SignWell and Resend as external services." width="100%">
 </p>
 
-<sub>Source: [`diagrams/architecture.mmd`](diagrams/architecture.mmd). Detailed flows: [request path](docs/request-flow.md) · [deploy path](docs/deploy-flow.md) · [client provisioning](docs/client-provisioning.md) · [decision log](docs/decisions.md).</sub>
+<sub>Hand-drawn SVG with Inter embedded; [`diagrams/check.py`](diagrams/check.py) verifies in CI that every label fits its box and no line crosses text. Mermaid sketch: [`diagrams/architecture.mmd`](diagrams/architecture.mmd). Detailed flows: [request path](docs/request-flow.md) · [deploy path](docs/deploy-flow.md) · [client provisioning](docs/client-provisioning.md) · [decision log](docs/decisions.md).</sub>
 
 ## Design principles
 

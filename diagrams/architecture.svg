@@ -1,10 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 980" width="1440" height="980" font-family="ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 980" width="1440" height="980" font-family="Inter, ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
   <title id="t">RaizHost cloud architecture</title>
   <desc id="d">Cloudflare DNS in front of ten CloudFront distributions. Static sites are served from S3; dynamic apps run on HTTP API Gateway and arm64 Lambda; one Graviton EC2 anchor runs Postgres, PgBouncer, Redis, NAT and the client portal. DynamoDB, S3 and Secrets Manager hold state. GitHub Actions deploys via OIDC through ECR and SSM; EventBridge Scheduler, CloudWatch and Route 53 health checks operate it. Stripe, SignWell and Resend are external services.</desc>
   <defs>
     <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker>
     <marker id="ahd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
     <style>
+@font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,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) format('woff2');}
+@font-face{font-family:'Inter';font-weight:600;src:url(data:font/woff2;base64,d09GMgABAAAAABhcAA8AAAAANxwAABgBAAQAQgAAAAAAAAAAAAAAAAAAAAAAAAAAGiIbqkYcKgZgP1NUQVRaAIEyEQgKtFCqUAE2AiQDgkgLgSYABCAFhDIHIBtpMKOinNUWH8VfJfBk9BpPOAo9RFEMLSp/FcNZbB2gQs2xncN4h1whfX2EJLM8T+3X5+l+3TOzRKgxCIoAbL6KQr0VB6QiFNuosFq1KoBz/S+b+v7eCghtn2RmnD5IUNRpmmzpMilZJz5pZXhg6LlLaQggeG8bX3vf/nwHgCVgywc/PMzrH6bqtnMV+nx6aswmFqViTNSKXqqpicpz165wTNRFu8nrFD+aAvjf2pRojOYwBiN5hEUijFqjI9nt/v/n+rS5S5xFzoIjYYAdgtoVZtX97+bPm7dvIJOlJAtEc2aWMifzIX+RWlZVBGqmxCmSAmAFrCtMT12FrJD/VKra6urakqGB16TeZV0swy9S1m0t8+px02Eoo2yIGGNUStm9f/snrIC5ACoBiUBCspAcuQiB2fIM4GcuvPx6zjvNEw8R752/+0HiQ31PPULEgexAZEmH+uDdTzxCq9+zFVQEaAjcHjapGApyAjUzN8KgnjNqt4Pz/lId1TGv8ptx0KVJE0TQHEQiS4FCRRpx+fnuRM93Mn0apxKk0dsyWboqO7pyR7u8lMsXBVCK9kbvOSgsQ5EiO1v+cKpUYy3iIPC2cHEeokmoHqZRfuOD/PxwIl9dnRW1NONQPiufzaelEtkUuDul9+FkrFJ+8+YWIeQhWVIQlteAblvvaxUl559MXUxJXX2dkst9iZ3UyGQQ1t11esVlyoOIefWlSpSTq9JAjWSyUZJjNGQUgDnkoJNSA2g4AVCAYFel5KqCDEYAlV6XEEgyPUgeDlY544wVD/zykheHprjEPm3PfPHLF77zvV+dd855v+GqcrQYIA4CTkpJRU1Hz8DMwsrGzsHJL1mKVOmK1arXiKmORGMkBOVpVhuRhgxiiiNxEDSUQbKKshxOWd5SoZlgYlAUGtWChuxrBxGKqAdr0dHkO11KALo9OI2MOeWsEbFlkCMMKZFINZAuhLjtIHv6WAgC2EpCFzIDOsVAbcLSsbApjeivw06mE9s1jIMFRu7d12jSYUTfQx0xZcGaHURHTkFDyyzZ3XlFEIXlq9WgkUmcxqd+Q8amgw4ONQmk2TGfPVdYMOW4AQlIQQ4KUIEaNKAFPRjBDcFVEeKEBMIQDTEQBwk52PwoHObPLGgXSRRyrbXeBboI8gelpVy6e+5PickIgNyEPCOll8mbtJzjn+De1I3OS0JIcmuJZqMoU/naWL75VcgfnsK0zMXTddMTvVKf+VUGSo5j5o35q/PmIWQtnGyOCjkSsnzLdBXiCjKSZ8R/w3JOgnN16zq0fEfdMnsle7MerI3kc9U9bYKF+RVsM1pkjvL9gzoJWRPdtXzlCao1G7No6WJEo4SIbowU7CU1hKIb2m/8IohouagKphqM8rQzRzDrQnLu2yDfybhQxHursX3pxVEQj8i5sRywOmlZiMddIgJScwkBXMjhiHEzp0OOeWYYbJ4agxNSBPmbSCB9QM6WFNGPY5g4HHA20s7hg2phDAYh3GoU6dJfJGmJTSrapXaXQibws6gHz7d5slWfhM9U8Udk3Txz8y8OzPhHs+ofZd123v+nVcnBDCYlVt1yWWTmfKc6XBFhmpuK1K0is8UbybWGJX3yZp4lHBdt7LSs3mNieob5+S4tf908qDopjjghkjFp+lEMn8k1rK+sUbrh+5Bxdgkh+6xuwMnKYAz3qfkAzmXsPp/xbmbFO2mR5vtJnKswI49K/EYo0b5i1syDLJj7IVR5LLdF5BlFz8c0YcyT5UrblP85L3KW375squNvosPnv6XwJMYxhpFnvlZajn0VHqQKg74W+PyVdhTI2R8ESzcA/jqYy18J+2KXlP79lXHJyuOW040Phgx9cM1DRGzjK1I0kHa5qSuhh+ZneelkXiYLYRZTHOrkskfwG9genJp83vXkxwSz+kkkoHmmS3z7hWOtyqZODPD3so0aDVlS5maxZmfYLJ8rqr/8lxGWzmx3SHQ/CLLcZpUQ5ykPqfhsw1NyfOYrKRIBtssWIVeeTIWKZCtRLleVBoUIaSBhYMPJiFyACTM7oInAmehpyAX5Wam5MYRA4eHEKACzWEDl8mFwUtKSEqj4eKkYxYkRALvEAvaJATuEJdABtokSSUfHQUfTIdzCjQVuZCWNaHatYOVkUE1kkp1R5jEUQi4DCgFRtns3qUjJKTnYKJlF8guCLQJgoyjAej4iLWANFzstLSMtArOJwthfqVL792lVexzqe27t/9pKAv1Ie4B3ja7qt96vXV+dZABQ8ddgAL+bXHvdFdf5YeNGmOL0dBVMfqj1oADtli7FRmqEyAlgKQHsxR597MkXij08e+99TxUZQP8c9KYVFEbKyItALQ60oCAoR2sQGDCsoAEFUAFfUqVy1zps5MefWyRRtESZcvQYNG3Hgff+bVy6s+PWfVisJNmKhxw284xPMHFxgglkOhvHjl9Ife7PpxA11VaC9fDHvFyVctXKFKlBKDt8wLWAs+BeGL8Oc/eD4+Don+TA+J3sUWrzExzoQrsYM6tlh3QOpjvVGStecs21NbNTonD3JwJlPgQGKtG+dUrTAa1WUbNqOrYlCDa4egfqtLvO27cj2HBg1fpg35Z0QIX7gvVKkrjChy7xouC01hxRdqW3Z8tmXUGe7O44S037d4fuy6LzYah6da3CW/48XbZidLHmCVc0yjowBLb+FSLIESOo7vJSv1wRKDGTxp1tUBaa8s9hx58ri6qxri2DytOAnIUZCDWVStyH6T7u/muQ66dotGUbgtfga9zip7D79GY1Xtbo42AtSZTviNHOCFtr2KnyakCB3DUFCuLmnxaHsnJEFvdlBauhNT7s8dR87Lg+jN24TsveSXeT5nbrTZS8iTzwjbaM0vgNXmrCVRMURHmdiClIYPOMjXcpCYPWxxdNGHPifEpL0nR8U5C7wHHcppMkQtnIH5exqfKFnUj1bmGrkSQGHRKkNC98a1yOVfeVZHE1aFcX/mHab0TRJmnpwV3jxy+KqVpM9UitZHJgo2eTWdpaSmRxY7GFNLSpJ+ltuCNxh2h0+1euneJXiOdafedQhhIxdWVkkWK0XsasrNWQOSNK6FoW6CszwAQeM3/hRCQuWyaNauMqKEJ6ttM0WXh16jP2fL+wyUg/RkBWFL+EMDn7gNSZyR2R9TVWdINvq+717XFluVzXHmVHTGjvPrcDCEoYuRT6NeV4s5UFD01hZhYV0YNhczJ3bvFqpo8l9HIIlU9dHGVkN/fr7nnrCaWtKOq6BpR2SteFXBA3ZG9ziNDvXY008oiM0qgVI8PpWIJg0uC2z2kjk+HGQV+VwhMRAdwduTTeBL5Im2VYAEkzcyQ10Xme0Q5nwgyVfllZnQusWdYXcG14cko4vfEprffq0RvWmCne61PftkPc/Np2LON3aDKgrEVHVB71yY641M4VlBHtWqOyp4y2JcHsDjYxNHX7c88yxC5RK09E4xIDt05lFMd00mWjKGpL9/6IDt+d+paVcf+85riCHoawCD5MWTZJAmc5F1/ZGl2gXhxgXKi3S/Jd+FqfNjgIGkAvt/X1w2FNdug6/xj4QTrQcgONQmiwMS2w8YX11CrpCcFr5W8YnDhtMrErwWFcowm9+EiuSNZTYXMIfU4VJSYZ6Jw5OanjonTg6f09b9bERi/XDjz4oS29H1gmsl1peSA9pYiUK/ofcrOYat5W37rEknvC1RTItbYZ2ThDoxRX90hnX9k7bqx5GF0zN81jCLaYmiyxcUft2TM+7H2JNFxlYjU/D3v5mEIIikX45/dXrI4WSn2PeUj1teoUDHi+ZlbT9pazXha6aVpyCirJq9qroBHISx17lmMZF5KoHqJ0T5yWJkWuJjC0KyU9aeQ14xz5pV59XkqwG5rJd/Y1nVHHJlmjwl0DBUl8KLDUgs1bD13239i8EmAzNCtcch8oYE1pC9TVXJGxYRiOnptwXMj8euYc68s4j+/G0aNhXOJU0RoazJixvoo1T1Ap+MRuX0hlvD9/lvHufkpLxqeyl86Xz5I/fTlLcb1ySF4KnkJ1J6o3c/vNRG3Jy5LumTcP3yVjbwan2C/ZfsCyGvYQPnrB/9vmlQDr4bmMJexAAXNIi619ABkW5JZ83J0/LmB9OXua9XVCmJU6EBjSk3inQUq9OtWrc7DB42pV+hBd1dihZKgE7N8d+kU1h76A/HzhrxrISedHRabxOQeV972QXQcBif+bk0OL6YUogniCxLttq/urFvAexiBxkDyzqifjp24bLIp7mLFZO+h3T632VZmvemKDtuP1121HjtcatOsVPdPOl6kD8lKVDQuZIrk2uU4cFEox6zdtNcr9smv9nc76F6NssxazAR0vHeAq1y7bIVtqtXEIZnbUGr6FFZE79SMOK/iqXIJ02mlo7k/JfOGtCYZcEnzBRWggz1aeVWgxfw8sUbB5+NCV2UJnzc/ZkHoBmxu5bK7N/hSM8Rlfz5wzqDkEQomA+fXsGeaXRn393mJ67ksO72VlFf/Ft5zzKc8psSIPpwxPTydBrlvc31tgamOjdjI89S8XcGrJPbL1ThOYx1uprOQ//pZyvvIFKzbH3jmB4uWcLEK0jy6C0aeX3Ae6dS5ss6oeyNcqKpB940us/ILEcGIEytGVyLfxgp42GTNfmOksqLjxO7u9az1BPCObIacc3kgX+PGtUIEOSJJnuvlkqa4PtA2dGYOviswvvPlvIpC32XzT++bepuom2Nw9rFncsNX1QHUkzKem0Sc+HoinFjai+qCrcUujGHgcg0v1tfIV9NL8zSwn7S1nfEzS6HnXO3pSCub36UuPqOnug/ofnzg6pUE10aIem9KfgPmr9e07oFa3b7e/3sTxKW2qmSb1lqU7AQ2DQvcd3QeXWqnX2R1K/UV9XyPqQI2h0tFM+r8UANefC7ujC0XCr2maeiBYljFP0V8to53YZh4jmmbHr1rO6utGO74hV9oEmnjfMLtq4g0PnvxABkHo49E19srLxnh02fEYzLFYVIUhBrJse1yuBg34A4bQAmu8sAGJ2+0foTQnG7X1hnTaIDrdlixqQ5F2+8co3ZKN+fIGzOgwz5AiGxLDMRl8fJO+t2KEikAz30DezoQUYIRC0wynljYsjkaViCZdkj279QoDveuSv/3dqlIZ4CWygE17p7ug6MiCOzMEdZxyXlOYrg3KxsIC5XcMrELDc1BEqp325W0gL4WYqtrhqdmu0XmP8oVg7DpPZkF8dzmQQ0P00+mOvZzQoABOsFN3QoJTHzcEJOr0rVfnyZ6/mAdZr+oL6zLPCvHL1fbesjprhLlM3m9O5UUg+hnxiJO8CKoF5cCcMb59y0rb1y8/O7TbEuhDCxbEPJnrY0KwkC+KyXYlUA1VTSGgS3cua9mRqFmofcv+nBDnvoQEp25usH8QJxTRS6cj+rk0wNM5s1WRJzN4QST3vbY77jq6ssRrqc6n9rK2wJrmUJnqGRDA80KKfYVMbE0uPsAh9KgbSuOnxf7gXPEsAZjG0O7P3ldbot1JDq3rJIR7MHYX29yBqBzDI7GuQ4A1Kr7plp1+AP+MchiJpp/wFtQk8xd1DPF+mQ6RogW+cHP4esb/C/m50TloYqidxuhOZEPR7DdafZM/x8u5hcV06uQEBQRxQxGdcfFOLVw/UFFZBQFdCooPmFUPVZeknY+kSYpuyXclp+XEebAQzqmglAahAaV6mnyXIKTtAlEIXzYgoXAYwAtHGNfOWv4wsB22BfJSCOjS0YT/Bkd+vwb2fpDuCr7x6v2mrAbdEx2TJXYiCOqbDtcd0YlOLGh2DYztCgw7nbUFuUtPCfdCUuEWNJfJ7RV/RpyvA83aLpZ4geBa2h9y0N1NxXO9QDItdbjfoDMunqcYJPdJqfxIx5Nx8UBYVCqX1Ounx6HceFDSAxTAdFQ7oiKFa+5SqfrKRa+tLbDevRBf1SgoI3KdXE1aoztH89tXxye+lPafRO1QRAM9Qsf3+PpvWEVdXKozio2tBRY6uTfw2RW7YrZMdXzSvcIjkkkOFngkSWvSqONYW1sGPaXprq84ZxibLNod8Mn0RLQX1TcR52CJd/HTnjDsPNbSwGUKutdCgNFvtPsZ9zuVIabO9ohdp6FGt88Hqxj3nOuqB0rq82uOiyWsmP4SOKV5VcnT/pSFwsxqRqrArf0Qms69cF2m9er+RPSBRKvV48y74bD9ejQggC3RdiUM7S0myezvOLa/xVn2lpU89BfvYj/bSfZAm9VqL6P4vEMY7D1NMe8W1F2/Q7dfm2jxspFev14X1PXN8wysrvSCO20Fh1MmLP3IPYZEtjGB0Gvlx5nY21N840rLwZJXln6ULkMc2xCH67pA3DXIrnS6++kiVc3Z9ZEmZn9MFMGXgWW6fCDJfX8SfEWXKQ2HHob8PBYUm12HjrUL1QQvDKCWlc2fJF7Tv6Xs8AREPwCKiXxT3hyH3wseSC/02s61Ir+trWL/7aFrQztDRf7EEPsFd3TtVaQ4G7Nx/gJmU5wTGQV0qRfOe2wUZYNflp+M/1yU36tQ/97GfAHiach/OEJUmhUbhUHFJtpiiYkIRCJ5p0L0+G1qfcObpKzZLF/njq6bNWWyiqolr0AptGOLVTYpl6nuhAsWWJC8hHaYGFd3bHyhY3jBwwIKxxYdiXaxD6PbYDzSLLDBR2RkMkvHPzOrG54l8cdSsuvO8PerxatX0Qh1YVkVc38kASZs2bDu8yUL1vl+tfTnUzB/SMTBf4G8FDCgte/ZhVNyQsgvHqFJNu5eQhxG5OePy88m+LiLrII2Dcg7tNe5xmVK1Y3IkNhzuOwCj6us+qL36/mgE8q8i+sdCIc9mPY60fxolS0uW0sonNDkK8D8s+Ij6dUCwttOVV1UMrXSwjN/IVPwtLK28NNGYc+aZxYJl+/thcnNIHohYn8heRrHO1Kw+VkUMGrY/1nl9es/Phr2fwfJsPK1hMIpLYES1D+TGU2vEhDedam4JFMrLL3zpJmCZ+V1RV82C7tlmLfxPSfJ/KswaV5YYfPfOsWZEj1PxCPI2NxMirdnJgmf5+2FzRUSgSus6XkCR5IWiivNT/NDKF6djz6GMnL0pGAtcAaGbmbWlpEBLDu0yVWrg65Nrp68WkIHjR7RP0jjpp8OpbaEu1vyAmMlps8wNq6RSKRjKMMK49eJyy4kjqW+qUA+iqrAr1OwS25glHYSHZuGJ/J/xbUxveyJDQUWKnQzn5Ffs5fyZgBJx08Sb26ulNtgT2R44dt+JfLT8Oi4/jf5s1mPgVnc3sMKf71HDmB1ZW21cxWIZI9AIgAEqLjxAkPULoQADy23UKq71HJzf8sBl8Cfb3/GlS//WAaoaV+4m29vP9w6AG7R29sDdwvo6QfdXXIFlIvl/sFYoYMn5tOwgZ27HwiQyuZ7XSzzDyJkORPQKvkGcIynDBXMPO65gXbMf8ggX0enIB+kixgIBMmbFbZdJBhp/qPVEpXnd2CsMqv/UmBWs21VDfW/ajz4o8Bi4CPwNJSzo31ZmXYXd2hnmlte+d57WS+f2olWreo+wyEKgaZk9bmko0fT6Xe3UQkAvz5TVF3s2rGdvH106VmltT+TtwYK/H1tLHsqU/0/Iz+ggl7bUQXXpQ53jHP9g3v7LW+2NSOuUdhW/qxe7Vb1aejdrq3YuXFkYgRVYZASxgrmwr7UrY3BjtPa3zHkvBNjKX3WsT4kBfnXWrO6tm2mndENNIpkk+Egc5chG380U/daF1abWSnNVlmjVBvbVG8f5CuwmBEUYeo2j9VVFy1FeEjtitBoRFyrkNKGhFqRHVJBsCaHKAPtP6/0PWa7n9lS6v39sMnWrrU2OlkX1f98boJdMSiB4DDq6ARAvcGdWmGnVbnXrEf5DB+CXh1mqA0AryJwrR7KdhEJspeD1ZnnlployqPRG6ARtxMao/VEE6T4VJI7ahIZ/neUcpfj28jIAHVBlpoNfSFo9uwlRHMgL6kairoInziasoiVWrRk24ppk6as8UuRJFkGRBuH8VXVFqyJWMHNNVmxaMa4UYhdbN2JqcBesUrVsCmEWJrpORIlmjTtdvPrRiQYtWheYoVOrGp8OkTp6HCiFYinNq3EojljWoybtG7OsBVpEiTRFbmx3arelMyt/ONRlA4KLaapWIALh4guES/jjrGaaVSMiGdcpZOLl9Hh5hstWTNt1LA5TunTdoxLlnZuUG2NuckWYX6wYQsEgOl7Tyk=) format('woff2');}
       .band{fill:#f8fafc;stroke:#cbd5e1;stroke-width:1.2;rx:10}
       .bandt{font-size:13px;font-weight:600;fill:#475569;letter-spacing:.4px;text-transform:uppercase}
       .box{stroke-width:1.4;rx:8}
@@ -24,26 +26,26 @@
   </defs>
   <rect width="1440" height="980" fill="#ffffff"/>
 
-  <!-- ===== Visitors ===== -->
-  <rect x="80" y="24" width="260" height="40" rx="20" fill="#0f172a"/>
-  <text x="210" y="49" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">Visitors · clients · prospects</text>
+  <!-- Visitors -->
+  <rect x="120" y="24" width="260" height="40" rx="20" fill="#0f172a"/>
+  <text x="250" y="49" text-anchor="middle" font-size="14" font-weight="600" fill="#ffffff">Visitors · clients · prospects</text>
 
-  <!-- ===== EDGE band (y 100–232) ===== -->
+  <!-- EDGE -->
   <rect class="band" x="40" y="100" width="900" height="132"/>
-  <text class="bandt" x="56" y="122">Edge — Cloudflare + CloudFront</text>
-  <rect class="box edge" x="80" y="140" width="260" height="72"/>
-  <text class="h" x="210" y="164" text-anchor="middle">Cloudflare DNS</text>
-  <text class="s" x="210" y="182" text-anchor="middle">DNS-only CNAMEs · DNSSEC · email routing</text>
-  <text class="m" x="210" y="198" text-anchor="middle">no Route 53 hosted zones</text>
-  <rect class="box aws" x="420" y="132" width="480" height="88"/>
-  <text class="h" x="660" y="156" text-anchor="middle">CloudFront ×10 · ACM TLS · PriceClass_100</text>
-  <text class="s" x="660" y="176" text-anchor="middle">one distribution per public hostname</text>
-  <text class="s" x="660" y="194" text-anchor="middle">CloudFront Functions: canonical URLs · index rewrite · bot block</text>
-  <text class="m" x="660" y="210" text-anchor="middle">per-behavior cache policies · s-maxage edge caching</text>
+  <text class="bandt" x="56" y="122">Edge</text>
+  <rect class="box edge" x="120" y="140" width="260" height="72"/>
+  <text class="h" x="250" y="164" text-anchor="middle">Cloudflare DNS</text>
+  <text class="s" x="250" y="182" text-anchor="middle">DNS-only CNAMEs · DNSSEC · email</text>
+  <text class="m" x="250" y="198" text-anchor="middle">no Route 53 hosted zones</text>
+  <rect class="box aws" x="450" y="132" width="470" height="88"/>
+  <text class="h" x="685" y="156" text-anchor="middle">CloudFront ×10 · ACM TLS · PriceClass_100</text>
+  <text class="s" x="685" y="176" text-anchor="middle">one distribution per public hostname</text>
+  <text class="s" x="685" y="194" text-anchor="middle">CloudFront Functions: canonical URLs · index rewrite · bot block</text>
+  <text class="m" x="685" y="210" text-anchor="middle">per-behavior cache policies · s-maxage edge caching</text>
 
-  <!-- ===== STATIC band (y 300–476) ===== -->
+  <!-- STATIC -->
   <rect class="band" x="40" y="300" width="460" height="176"/>
-  <text class="bandt" x="56" y="322">Static surfaces — S3 origins via OAC</text>
+  <text class="bandt" x="56" y="322">Static sites</text>
   <rect class="box aws" x="64" y="340" width="200" height="52"/>
   <text class="h" x="164" y="361" text-anchor="middle">raizhost.com</text>
   <text class="s" x="164" y="379" text-anchor="middle">Astro marketing site</text>
@@ -57,9 +59,9 @@
   <text class="h" x="376" y="427" text-anchor="middle">status.raizhost.com</text>
   <text class="s" x="376" y="445" text-anchor="middle">public status page</text>
 
-  <!-- ===== DYNAMIC band (y 300–476) ===== -->
+  <!-- DYNAMIC -->
   <rect class="band" x="540" y="300" width="500" height="176"/>
-  <text class="bandt" x="556" y="322">Dynamic apps — scale-to-zero</text>
+  <text class="bandt" x="556" y="322">Dynamic apps</text>
   <rect class="box aws" x="564" y="350" width="180" height="70"/>
   <text class="h" x="654" y="375" text-anchor="middle">HTTP API Gateway ×9</text>
   <text class="s" x="654" y="393" text-anchor="middle">CORS · stage throttling</text>
@@ -70,29 +72,29 @@
   <text class="s" x="900" y="395" text-anchor="middle">Go / Rust zip APIs · Node pollers</text>
   <text class="m" x="900" y="416" text-anchor="middle">llm.raizhost.com · tenant apps</text>
   <text class="m" x="900" y="432" text-anchor="middle">quote capture · sales CRM</text>
-  <text class="m" x="900" y="448" text-anchor="middle">in-VPC when they need Postgres</text>
+  <text class="m" x="900" y="448" text-anchor="middle">scale-to-zero · in-VPC for Postgres</text>
 
-  <!-- ===== DATA band (y 540–700) ===== -->
+  <!-- DATA -->
   <rect class="band" x="40" y="540" width="460" height="160"/>
   <text class="bandt" x="56" y="562">Data &amp; state</text>
-  <path class="data" stroke-width="1.4" d="M64 590a58 9 0 0 1 116 0v70a58 9 0 0 1 -116 0z"/>
-  <path d="M64 590a58 9 0 0 0 116 0" fill="none" stroke="#059669" stroke-width="1.4"/>
-  <text class="h" x="122" y="620" text-anchor="middle">DynamoDB ×2</text>
-  <text class="s" x="122" y="638" text-anchor="middle">on-demand · PITR</text>
-  <text class="m" x="122" y="654" text-anchor="middle">quotes · CRM</text>
-  <rect class="box data" x="204" y="580" width="164" height="90"/>
-  <text class="h" x="286" y="604" text-anchor="middle">S3 ×15</text>
-  <text class="s" x="286" y="622" text-anchor="middle">site origins · assets</text>
-  <text class="s" x="286" y="638" text-anchor="middle">backups · tfstate</text>
-  <text class="m" x="286" y="656" text-anchor="middle">signed contracts (versioned)</text>
-  <rect class="box data" x="384" y="580" width="92" height="90"/>
-  <text class="h" x="430" y="616" text-anchor="middle">Secrets</text>
-  <text class="h" x="430" y="633" text-anchor="middle">Manager</text>
-  <text class="m" x="430" y="654" text-anchor="middle">×10</text>
+  <rect class="box data" x="64" y="580" width="172" height="90"/>
+  <text class="h" x="150" y="604" text-anchor="middle">S3 ×15</text>
+  <text class="s" x="150" y="622" text-anchor="middle">site origins · assets</text>
+  <text class="s" x="150" y="638" text-anchor="middle">backups · tfstate</text>
+  <text class="m" x="150" y="656" text-anchor="middle">signed contracts (versioned)</text>
+  <path class="data" stroke-width="1.4" d="M252 590a60 9 0 0 1 120 0v70a60 9 0 0 1 -120 0z"/>
+  <path d="M252 590a60 9 0 0 0 120 0" fill="none" stroke="#059669" stroke-width="1.4"/>
+  <text class="h" x="312" y="620" text-anchor="middle">DynamoDB ×2</text>
+  <text class="s" x="312" y="638" text-anchor="middle">on-demand · PITR</text>
+  <text class="m" x="312" y="654" text-anchor="middle">quotes · CRM</text>
+  <rect class="box data" x="388" y="580" width="92" height="90"/>
+  <text class="h" x="434" y="616" text-anchor="middle">Secrets</text>
+  <text class="h" x="434" y="633" text-anchor="middle">Manager</text>
+  <text class="m" x="434" y="654" text-anchor="middle">×10</text>
 
-  <!-- ===== ANCHOR band (y 540–700) ===== -->
+  <!-- ANCHOR -->
   <rect class="band" x="540" y="540" width="500" height="160"/>
-  <text class="bandt" x="556" y="562">The anchor — the only always-on compute</text>
+  <text class="bandt" x="556" y="562">The anchor — always-on compute</text>
   <rect class="box aws" x="564" y="578" width="452" height="102"/>
   <text class="h" x="790" y="602" text-anchor="middle">EC2 t4g.medium (Graviton) · ~$25/mo all-in</text>
   <text class="s" x="790" y="622" text-anchor="middle">Postgres (many DBs) + PgBouncer · Redis</text>
@@ -100,7 +102,7 @@
   <text class="s" x="790" y="656" text-anchor="middle">app.raizhost.com portal — Docker, behind CloudFront</text>
   <text class="m" x="790" y="673" text-anchor="middle">SSM access only · nightly pg_dumpall → S3 · daily EBS snapshots</text>
 
-  <!-- ===== OPERATE column (x 1120–1400, y 100–700) ===== -->
+  <!-- OPERATE -->
   <rect class="band" x="1120" y="100" width="280" height="600"/>
   <text class="bandt" x="1136" y="122">Operate — CI/CD · ops</text>
   <rect class="box ops" x="1140" y="140" width="240" height="66"/>
@@ -129,70 +131,54 @@
   <text class="s" x="1260" y="656" text-anchor="middle">+ gated provisioning scripts</text>
   <text class="m" x="1260" y="672" text-anchor="middle">plan by default · --execute to apply</text>
 
-  <!-- ===== EXTERNAL band (y 770–880) ===== -->
+  <!-- EXTERNAL -->
   <rect class="band" x="40" y="770" width="1360" height="110"/>
   <text class="bandt" x="56" y="792">External services</text>
-  <rect class="box saas" x="80" y="812" width="220" height="50"/>
-  <text class="h" x="190" y="833" text-anchor="middle">Stripe</text>
-  <text class="s" x="190" y="850" text-anchor="middle">subscriptions · payment links</text>
-  <rect class="box saas" x="330" y="812" width="220" height="50"/>
-  <text class="h" x="440" y="833" text-anchor="middle">SignWell</text>
-  <text class="s" x="440" y="850" text-anchor="middle">e-signature before payment</text>
-  <rect class="box saas" x="580" y="812" width="220" height="50"/>
-  <text class="h" x="690" y="833" text-anchor="middle">Resend</text>
-  <text class="s" x="690" y="850" text-anchor="middle">transactional email</text>
+  <rect class="box saas" x="240" y="812" width="220" height="50"/>
+  <text class="h" x="350" y="833" text-anchor="middle">Stripe</text>
+  <text class="s" x="350" y="850" text-anchor="middle">subscriptions · payment links</text>
+  <rect class="box saas" x="490" y="812" width="220" height="50"/>
+  <text class="h" x="600" y="833" text-anchor="middle">SignWell</text>
+  <text class="s" x="600" y="850" text-anchor="middle">e-signature before payment</text>
+  <rect class="box saas" x="740" y="812" width="220" height="50"/>
+  <text class="h" x="850" y="833" text-anchor="middle">Resend</text>
+  <text class="s" x="850" y="850" text-anchor="middle">transactional email</text>
   <rect class="box legacy" x="1000" y="812" width="380" height="50"/>
   <text class="h" x="1190" y="833" text-anchor="middle" fill="#52525b">Hetzner VPS — legacy shadow</text>
   <text class="s" x="1190" y="850" text-anchor="middle" fill="#71717a">read-only rollback backstop · being retired</text>
 
-  <!-- ===== EDGES (orthogonal only) ===== -->
-  <!-- visitors → DNS → CloudFront -->
-  <path class="l" d="M210 64 L 210 140"/>
-  <path class="l" d="M340 176 L 420 176"/>
-  <!-- CloudFront → static band (cache miss) -->
-  <path class="l" d="M460 220 L 460 300"/>
-  <text class="lbl" x="468" y="266">static sites (cache miss only)</text>
-  <!-- CloudFront → API Gateway -->
-  <path class="l" d="M654 220 L 654 350"/>
-  <!-- CloudFront → anchor portal, via the right-hand bus (x=1060) -->
-  <path class="l" d="M900 160 L 1060 160 L 1060 600 L 1016 600"/>
-  <text class="lbl" x="980" y="152" text-anchor="middle">app.raizhost.com</text>
-  <!-- API Gateway → Lambda -->
+  <!-- EDGES -->
+  <path class="l" d="M250 64 L 250 140"/>
+  <path class="l" d="M380 176 L 450 176"/>
+  <path class="l" d="M480 220 L 480 262 L 240 262 L 240 340"/>
+  <text class="lbl" x="330" y="256" text-anchor="middle">static sites (cache miss only)</text>
+  <path class="l" d="M700 220 L 700 350"/>
+  <path class="l" d="M920 160 L 1060 160 L 1060 600 L 1016 600"/>
+  <text class="lbl" x="990" y="152" text-anchor="middle">app.raizhost.com</text>
   <path class="l" d="M744 385 L 784 385"/>
-  <!-- Lambda → anchor Postgres -->
   <path class="l" d="M900 458 L 900 578"/>
   <text class="lbl" x="908" y="522">Postgres via PgBouncer</text>
-  <!-- Lambda → DynamoDB + Secrets, via the inter-band channel (y=508) -->
-  <path class="l" d="M820 458 L 820 508 L 122 508 L 122 586"/>
-  <path class="l" d="M430 508 L 430 580"/>
+  <path class="l" d="M820 458 L 820 508 L 312 508 L 312 586"/>
+  <path class="l" d="M434 508 L 434 580"/>
   <text class="lbl" x="600" y="500" text-anchor="middle">key-value data · secrets</text>
-  <!-- anchor → S3 (publish + backups), below the data boxes -->
-  <path class="l" d="M620 680 L 620 692 L 286 692 L 286 670"/>
-  <text class="lbl" x="440" y="683" text-anchor="middle">publish sites · nightly pg_dumpall</text>
-  <!-- anchor → external services -->
-  <path class="l" d="M690 680 L 690 740 L 190 740 L 190 812"/>
-  <path class="l" d="M440 740 L 440 812"/>
-  <path class="l" d="M690 740 L 690 812"/>
-  <text class="lbl" x="708" y="762">billing · contracts · mail (portal + quotes API)</text>
-  <!-- Operate column chain -->
+  <path class="l" d="M620 680 L 620 696 L 150 696 L 150 670"/>
+  <text class="lbl" x="470" y="688" text-anchor="middle">publish sites · nightly pg_dumpall</text>
+  <path class="l" d="M690 680 L 690 740 L 350 740 L 350 812"/>
+  <path class="l" d="M690 740 L 850 740 L 850 812"/>
+  <path class="l" d="M600 740 L 600 812"/>
+  <text class="lbl" x="880" y="758">billing · contracts · mail (portal + quotes API)</text>
   <path class="l" d="M1260 206 L 1260 232"/>
   <path class="l" d="M1260 282 L 1260 308"/>
-  <!-- GitHub Actions → S3 site origins (static deploys), via top-right channel -->
-  <path class="l" d="M1140 152 L 1104 152 L 1104 84 L 380 84 L 380 340"/>
-  <text class="lbl" x="820" y="78" text-anchor="middle">GitHub Actions deploys static sites: 4-pass s3 sync + CloudFront invalidation</text>
-  <!-- ECR → Lambda (bus x=1080) -->
+  <path class="l" d="M1140 152 L 1104 152 L 1104 84 L 415 84 L 415 340"/>
+  <text class="lbl" x="760" y="78" text-anchor="middle">GitHub Actions deploys static sites: 4-pass s3 sync + CloudFront invalidation</text>
   <path class="l" d="M1140 257 L 1080 257 L 1080 385 L 1016 385"/>
-  <!-- SSM → anchor (bus x=1100) -->
   <path class="l" d="M1140 341 L 1100 341 L 1100 640 L 1016 640"/>
-  <!-- EventBridge → Lambda -->
   <path class="l" d="M1140 433 L 1016 433"/>
-  <!-- CloudWatch → anchor (control plane) -->
-  <path class="ld" d="M1140 533 L 1060 533 L 1060 660 L 1016 660"/>
-  <!-- Terraform → platform (control plane) -->
+  <path class="ld" d="M1140 533 L 1045 533 L 1045 660 L 1016 660"/>
   <path class="ld" d="M1140 641 L 1110 641 L 1110 722 L 790 722 L 790 680"/>
   <text class="lbl" x="950" y="716" text-anchor="middle">Terraform manages the platform resources</text>
 
-  <!-- ===== Legend ===== -->
+  <!-- Legend -->
   <g font-size="11" fill="#475569">
     <rect x="40" y="922" width="14" height="14" class="aws" rx="3"/><text x="60" y="933">AWS (us-east-1, one account)</text>
     <rect x="230" y="922" width="14" height="14" class="edge" rx="3"/><text x="250" y="933">Cloudflare</text>

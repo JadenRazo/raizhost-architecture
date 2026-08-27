@@ -27,6 +27,11 @@ jobs:
         with:
           args: -i diagrams/architecture.mmd -o /tmp/architecture.svg -b transparent
 
+      - name: Diagram geometry check (text fits boxes, no line crosses text)
+        run: |
+          pip install --quiet fonttools brotli
+          python3 diagrams/check.py diagrams/architecture.svg
+
       - name: Check for private identifiers
         run: |
           set -euo pipefail
