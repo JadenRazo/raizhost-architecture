@@ -1,0 +1,20 @@
+flowchart TB
+  plan[Run new-client-site in plan mode] --> inspect[Read existing AWS and Cloudflare state]
+  inspect --> manifest[Print exact mutation manifest]
+  manifest --> approve{Run again with --execute<br/>and approve the guard prompt?}
+  approve -->|no| stop[No changes]
+  approve -->|yes| first[S3 bucket + versioning<br/>ACM certificate + validation CNAME]
+  first --> issued{Certificate issued?}
+  issued -->|not yet| wait[Stop cleanly<br/>re-run after validation]
+  wait --> approve
+  issued -->|yes| edge[CloudFront function + OAC + distribution<br/>scoped bucket policy]
+  edge --> dns[Create-only site CNAMEs in Cloudflare]
+  dns --> monitor[Route 53 HTTPS health check<br/>CloudWatch alarm to SNS]
+  monitor --> record[Write client registry<br/>resource map + Terraform import map]
+
+  classDef action fill:#eef2ff,stroke:#4f46e5,color:#111827
+  classDef decision fill:#fff7ed,stroke:#ea580c,color:#111827
+  classDef safe fill:#ecfdf5,stroke:#059669,color:#111827
+  class plan,inspect,manifest,first,edge,dns,monitor action
+  class approve,issued decision
+  class stop,wait,record safe

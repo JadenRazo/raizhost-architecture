@@ -1,27 +1,16 @@
 # Deploy flow
 
-Every repository deploys from GitHub Actions using **OIDC role assumption** — a per-repo IAM
-role whose trust policy binds to `repo:<owner>/<repo>` *and* the `production` environment on
-`main`. There are no stored AWS keys anywhere in CI.
+Deployments are GitHub Actions workflows using **OIDC role assumption**: a per-repository IAM role
+binds deployment permission to the expected repository/ref or protected environment. There are no
+stored AWS keys in CI. Runner identity and deploy identity are separate: the `raizhost-app` runner
+is an ephemeral CodeBuild environment with only source-connection and log permissions; the workflow
+must still assume its narrower deploy role.
 
-```mermaid
-flowchart TB
-  PR["PR → CI<br/>build · lint · tests · QA gate"] --> M["merge to main"]
-  M --> W["Deploy workflow<br/>assume role via OIDC"]
+<p align="center">
+  <img src="../diagrams/deploy-flow.svg" alt="Reviewed changes enter GitHub Actions. The app uses one-job CodeBuild runners while other repositories use their onboarded runner path. Jobs assume separate OIDC deploy roles, then deploy static sites to S3 and CloudFront, Lambda artifacts to Lambda, or the client editor through ECR and SSM with health-gated rollback. Client editor publishes first create a content commit in the client's repository." width="100%">
+</p>
 
-  W -->|"static site"| S1["pass 1: /_astro/* → immutable, 1y"]
-  S1 --> S2["pass 2: images/fonts → 1d + s-maxage 30d + SWR"]
-  S2 --> S3["pass 3: HTML/xml/txt → max-age=0, s-maxage=1d"]
-  S3 --> S4["invalidate /*"] --> S5["final sync --delete<br/>old hashed assets outlive cached HTML"] --> V1["verify: 200s, cache headers, ?v=N"]
-
-  W -->|"Lambda app"| C1["docker build --platform arm64"] --> C2["push to ECR<br/>keep-last-5"] --> C3["lambda update-function-code"] --> C4["wait for Active"]
-
-  W -->|"portal on anchor"| P1["docker build --platform arm64"] --> P2["push to ECR"] --> P3["SSM RunCommand<br/>deploy.sh <sha>"]
-  P3 --> P4{"container /api/health"}
-  P4 -->|ok| P5["mark .last-good<br/>invalidate CloudFront"]
-  P4 -->|fail| P6["roll back to .last-good<br/>fail the workflow"]
-  P5 --> P7["install.sh --check<br/>on-box drift check"]
-```
+<sub>Editable source: [`diagrams/deploy-flow.mmd`](../diagrams/deploy-flow.mmd). A committed SVG is embedded so the flow remains visible in GitHub's mobile clients.</sub>
 
 ## Why three shapes
 
@@ -29,15 +18,31 @@ flowchart TB
 |:--|:--|:--|
 | **Static sites** | `aws s3 sync` in ordered passes + one invalidation | The order matters: HTML goes last so it never references an asset that isn't uploaded yet, and a final `--delete` pass runs *after* invalidation so cached HTML can still find the old hashed assets it points to. `--size-only` is banned because sync only stamps cache-control on objects it uploads. |
 | **Lambda apps** | Image push + `update-function-code` | Immutable images, instant rollback by pointing at the previous tag. Images are built arm64 in CI so Graviton Lambdas never run under emulation. |
-| **Portal** | SSM RunCommand executing an on-box `deploy.sh` | The portal is stateful and lives on the anchor. SSM gives an audited, IAM-scoped way to run the deploy without opening SSH. The script is health-gated with automatic rollback, and the on-box files are tracked in the app repo with a read-only drift check that runs after every deploy. |
+| **Client editor** | SSM RunCommand executing an on-box `deploy.sh` | The editor is stateful and lives on the anchor. SSM gives an audited, IAM-scoped way to run the deploy without opening SSH. The script is health-gated with automatic rollback, and the on-box files are tracked in the app repo with a read-only drift check that runs after every deploy. |
+
+## Runner path
+
+`raizhost-app` moved to CodeBuild-hosted GitHub Actions runners on 2026-08-30. Each job gets a
+fresh environment and then terminates; ordinary checks use small ARM compute, browser checks use a
+disposable Ubuntu x86 image, and production image builds use ARM. The runner service role has no
+application permissions. Other repositories remain on their existing runner path until they are
+onboarded through a separately reviewed trust domain.
+
+This migration followed a GitHub-hosted runner billing incident that blocked the app and Showers
+workflows on 2026-08-27/28. It is a targeted resilience change, not a claim that every repository
+has already moved.
 
 ## Terraform
 
-Infrastructure changes go through a `terraform-ci` workflow (fmt, tflint, trivy, plan) plus a
-scheduled drift-detection run. Applies for the platform are deliberately targeted and
-human-run; day-to-day client provisioning uses the gated scripts described in
-[client-provisioning.md](client-provisioning.md), which emit a `terraformImport` map so the
-resources they create can be adopted into state later.
+Infrastructure CI is intentionally **static-only while the H8 drift reconciliation is open**. It
+runs formatting, backend-free validation, security scanners, and runner-factory tests, but has no
+AWS identity and cannot run a live plan or apply. The old scheduled drift job is unscheduled and
+retained as a sentinel. The last known live plan included destructive production DNS drift, so
+making that path automatic would be unsafe.
+
+Platform applies remain targeted and human-run. Day-to-day client provisioning uses the gated
+scripts described in [client-provisioning.md](client-provisioning.md), which emit a
+`terraformImport` map so the resources they create can be adopted after state is reconciled.
 
 ## One gotcha worth writing down
 

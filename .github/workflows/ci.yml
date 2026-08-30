@@ -22,10 +22,28 @@ jobs:
             **/*.md
             !node_modules
 
-      - name: Render Mermaid source (fails on syntax errors)
+      - name: Render architecture source (fails on syntax errors)
         uses: docker://minlag/mermaid-cli:11.4.2
         with:
-          args: -i diagrams/architecture.mmd -o /tmp/architecture.svg -b transparent
+          args: -i diagrams/architecture.mmd -o /tmp/architecture.svg -c diagrams/mermaid-config.json -b transparent
+
+      - name: Render request-flow source
+        uses: docker://minlag/mermaid-cli:11.4.2
+        with:
+          args: -i diagrams/request-flow.mmd -o /tmp/request-flow.svg -c diagrams/mermaid-config.json -b transparent
+
+      - name: Render deploy-flow source
+        uses: docker://minlag/mermaid-cli:11.4.2
+        with:
+          args: -i diagrams/deploy-flow.mmd -o /tmp/deploy-flow.svg -c diagrams/mermaid-config.json -b transparent
+
+      - name: Render client-provisioning source
+        uses: docker://minlag/mermaid-cli:11.4.2
+        with:
+          args: -i diagrams/client-provisioning.mmd -o /tmp/client-provisioning.svg -c diagrams/mermaid-config.json -b transparent
+
+      - name: Check mobile-safe embeds and render freshness
+        run: python3 diagrams/check_docs.py
 
       - name: Diagram geometry check (text fits boxes, no line crosses text)
         run: |

@@ -1,0 +1,21 @@
+flowchart TB
+  browser([Browser]) --> dns[Cloudflare DNS<br/>DNS-only CNAME]
+  dns --> edge[CloudFront<br/>ACM TLS + edge functions]
+
+  edge -->|static surface| s3[S3 origin through OAC<br/>marketing + demos + client sites + status]
+  edge -->|serverless route| api[HTTP API Gateway]
+  api --> lambda[arm64 Lambda]
+  edge -->|app.raizhost.com| editor[Client editor on the anchor<br/>Docker on EC2]
+
+  lambda -->|relational apps| pool[PgBouncer on the anchor]
+  pool --> postgres[(Postgres)]
+  lambda -->|key-value apps| ddb[(DynamoDB on-demand)]
+  lambda --> secrets[Secrets Manager]
+  lambda -->|outbound from private subnets| nat[Anchor NAT<br/>no NAT Gateway]
+
+  classDef edgeNode fill:#fff7ed,stroke:#ea580c,color:#111827
+  classDef aws fill:#eef2ff,stroke:#4f46e5,color:#111827
+  classDef data fill:#ecfdf5,stroke:#059669,color:#111827
+  class dns edgeNode
+  class edge,api,lambda,editor,pool,nat aws
+  class s3,postgres,ddb,secrets data

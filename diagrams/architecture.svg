@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 980" width="1440" height="980" font-family="Inter, ui-sans-serif, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
   <title id="t">RaizHost cloud architecture</title>
-  <desc id="d">Cloudflare DNS in front of ten CloudFront distributions. Static sites are served from S3; dynamic apps run on HTTP API Gateway and arm64 Lambda; one Graviton EC2 anchor runs Postgres, PgBouncer, Redis, NAT and the client portal. DynamoDB, S3 and Secrets Manager hold state. GitHub Actions deploys via OIDC through ECR and SSM; EventBridge Scheduler, CloudWatch and Route 53 health checks operate it. Stripe, SignWell and Resend are external services.</desc>
+  <desc id="d">Cloudflare DNS in front of ten CloudFront distributions. Static sites are served from S3; dynamic apps run on HTTP API Gateway and arm64 Lambda; one Graviton EC2 anchor runs Postgres, PgBouncer, Redis, NAT and the client editor. DynamoDB, S3 and Secrets Manager hold state. GitHub Actions uses an ephemeral CodeBuild runner for the app and separate OIDC deploy roles through ECR and SSM; EventBridge Scheduler, CloudWatch and Route 53 health checks operate the platform. Stripe, SignWell and Resend are external services.</desc>
   <defs>
     <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker>
     <marker id="ahd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#94a3b8"/></marker>
@@ -39,7 +39,7 @@
   <text class="m" x="250" y="198" text-anchor="middle">no Route 53 hosted zones</text>
   <rect class="box aws" x="450" y="132" width="470" height="88"/>
   <text class="h" x="685" y="156" text-anchor="middle">CloudFront ×10 · ACM TLS · PriceClass_100</text>
-  <text class="s" x="685" y="176" text-anchor="middle">one distribution per public hostname</text>
+  <text class="s" x="685" y="176" text-anchor="middle">one distribution per surface or domain group</text>
   <text class="s" x="685" y="194" text-anchor="middle">CloudFront Functions: canonical URLs · index rewrite · bot block</text>
   <text class="m" x="685" y="210" text-anchor="middle">per-behavior cache policies · s-maxage edge caching</text>
 
@@ -96,19 +96,19 @@
   <rect class="band" x="540" y="540" width="500" height="160"/>
   <text class="bandt" x="556" y="562">The anchor — always-on compute</text>
   <rect class="box aws" x="564" y="578" width="452" height="102"/>
-  <text class="h" x="790" y="602" text-anchor="middle">EC2 t4g.medium (Graviton) · ~$25/mo all-in</text>
+  <text class="h" x="790" y="602" text-anchor="middle">EC2 t4g.medium (Graviton) · ~$25/mo compute</text>
   <text class="s" x="790" y="622" text-anchor="middle">Postgres (many DBs) + PgBouncer · Redis</text>
   <text class="s" x="790" y="639" text-anchor="middle">NAT for private Lambda subnets (no NAT Gateway)</text>
-  <text class="s" x="790" y="656" text-anchor="middle">app.raizhost.com portal — Docker, behind CloudFront</text>
-  <text class="m" x="790" y="673" text-anchor="middle">SSM access only · nightly pg_dumpall → S3 · daily EBS snapshots</text>
+  <text class="s" x="790" y="656" text-anchor="middle">app.raizhost.com editor — Docker, behind CloudFront</text>
+  <text class="m" x="790" y="673" text-anchor="middle">content commits → client repos · SSM deploys · Postgres backups</text>
 
   <!-- OPERATE -->
   <rect class="band" x="1120" y="100" width="280" height="600"/>
   <text class="bandt" x="1136" y="122">Operate — CI/CD · ops</text>
   <rect class="box ops" x="1140" y="140" width="240" height="66"/>
-  <text class="h" x="1260" y="162" text-anchor="middle">GitHub Actions</text>
-  <text class="s" x="1260" y="180" text-anchor="middle">OIDC roles · no stored keys</text>
-  <text class="m" x="1260" y="196" text-anchor="middle">CI gate → deploy on merge</text>
+  <text class="h" x="1260" y="162" text-anchor="middle">GitHub Actions workflows</text>
+  <text class="s" x="1260" y="180" text-anchor="middle">ephemeral CodeBuild runner: app</text>
+  <text class="m" x="1260" y="196" text-anchor="middle">separate repo-scoped OIDC deploy roles</text>
   <rect class="box ops" x="1140" y="232" width="240" height="50"/>
   <text class="h" x="1260" y="253" text-anchor="middle">ECR ×7 · arm64 images</text>
   <text class="s" x="1260" y="271" text-anchor="middle">keep-last-5 lifecycle</text>
@@ -124,12 +124,12 @@
   <text class="h" x="1260" y="514" text-anchor="middle">CloudWatch · Route 53 checks</text>
   <text class="s" x="1260" y="532" text-anchor="middle">uptime · Lambda errors · CF 5xx</text>
   <text class="s" x="1260" y="548" text-anchor="middle">EC2 self-heal → SNS email</text>
-  <text class="m" x="1260" y="564" text-anchor="middle">14-day logs · 2× Budgets at $100</text>
+  <text class="m" x="1260" y="564" text-anchor="middle">2× $100 budgets · CodeBuild $10 budget</text>
   <rect class="box ops" x="1140" y="600" width="240" height="82"/>
-  <text class="h" x="1260" y="622" text-anchor="middle">Terraform ~330 resources</text>
-  <text class="s" x="1260" y="640" text-anchor="middle">S3 backend · per-account guard</text>
-  <text class="s" x="1260" y="656" text-anchor="middle">+ gated provisioning scripts</text>
-  <text class="m" x="1260" y="672" text-anchor="middle">plan by default · --execute to apply</text>
+  <text class="h" x="1260" y="622" text-anchor="middle">Terraform + CloudFormation</text>
+  <text class="s" x="1260" y="640" text-anchor="middle">~330 declarations · runner factory</text>
+  <text class="s" x="1260" y="656" text-anchor="middle">gated provisioning + import maps</text>
+  <text class="m" x="1260" y="672" text-anchor="middle">Terraform CI static-only until drift closes</text>
 
   <!-- EXTERNAL -->
   <rect class="band" x="40" y="770" width="1360" height="110"/>
@@ -162,7 +162,7 @@
   <path class="l" d="M434 508 L 434 580"/>
   <text class="lbl" x="600" y="500" text-anchor="middle">key-value data · secrets</text>
   <path class="l" d="M620 680 L 620 696 L 150 696 L 150 670"/>
-  <text class="lbl" x="470" y="688" text-anchor="middle">publish sites · nightly pg_dumpall</text>
+  <text class="lbl" x="470" y="688" text-anchor="middle">nightly pg_dumpall · versioned storage</text>
   <path class="l" d="M690 680 L 690 740 L 350 740 L 350 812"/>
   <path class="l" d="M690 740 L 850 740 L 850 812"/>
   <path class="l" d="M600 740 L 600 812"/>
@@ -171,12 +171,14 @@
   <path class="l" d="M1260 282 L 1260 308"/>
   <path class="l" d="M1140 152 L 1104 152 L 1104 84 L 415 84 L 415 340"/>
   <text class="lbl" x="760" y="78" text-anchor="middle">GitHub Actions deploys static sites: 4-pass s3 sync + CloudFront invalidation</text>
+  <path class="l" d="M1016 620 L 1045 620 L 1045 190 L 1140 190"/>
+  <text class="lbl" x="1035" y="510" transform="rotate(-90 1035 510)" text-anchor="middle">editor content commit → client repository</text>
   <path class="l" d="M1140 257 L 1080 257 L 1080 385 L 1016 385"/>
   <path class="l" d="M1140 341 L 1100 341 L 1100 640 L 1016 640"/>
   <path class="l" d="M1140 433 L 1016 433"/>
   <path class="ld" d="M1140 533 L 1045 533 L 1045 660 L 1016 660"/>
   <path class="ld" d="M1140 641 L 1110 641 L 1110 722 L 790 722 L 790 680"/>
-  <text class="lbl" x="950" y="716" text-anchor="middle">Terraform manages the platform resources</text>
+  <text class="lbl" x="950" y="716" text-anchor="middle">declared infrastructure · drift reconciliation open</text>
 
   <!-- Legend -->
   <g font-size="11" fill="#475569">
@@ -188,6 +190,6 @@
     <line x1="630" y1="929" x2="670" y2="929" stroke="#64748b" stroke-width="1.5"/><text x="678" y="933">traffic / deploys</text>
     <line x1="780" y1="929" x2="820" y2="929" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="5 4"/><text x="828" y="933">control plane</text>
   </g>
-  <text x="1400" y="933" text-anchor="end" font-size="12" font-weight="600" fill="#0f172a">Core platform ≈ $50/month · everything arm64 · idle cost ≈ $0</text>
-  <text x="1400" y="954" text-anchor="end" font-size="11" fill="#64748b">RaizHost architecture · August 2026 · github.com/JadenRazo/raizhost-architecture</text>
+  <text x="1400" y="933" text-anchor="end" font-size="12" font-weight="600" fill="#0f172a">Expected AWS total ≈ $90–95/month · serving core ≈ $50</text>
+  <text x="1400" y="954" text-anchor="end" font-size="11" fill="#64748b">RaizHost architecture · reconciled 2026-08-30 · github.com/JadenRazo/raizhost-architecture</text>
 </svg>

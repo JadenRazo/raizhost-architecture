@@ -1,0 +1,35 @@
+flowchart TB
+  change[Merge reviewed change to main] --> workflow[GitHub Actions workflow]
+  editor[Client publishes an allowed content edit] -->|commit through source adapter| siteRepo[Client site repository]
+  siteRepo --> workflow
+
+  workflow --> runner{Job runner}
+  runner -->|raizhost-app| codebuild[Fresh CodeBuild environment<br/>one job, then destroyed]
+  runner -->|other onboarded paths| hosted[GitHub-hosted runner]
+  codebuild --> oidc[Assume repository/ref-scoped<br/>AWS deploy role through OIDC]
+  hosted --> oidc
+
+  oidc --> target{Deployment target}
+  target -->|static site| static[Build + four-pass S3 sync<br/>per-class cache-control]
+  static --> invalidate[CloudFront invalidation]
+  invalidate --> verify[Live verification]
+
+  target -->|Lambda app| lambda[Build arm64 image or ZIP<br/>publish immutable artifact]
+  lambda --> activate[Update Lambda<br/>wait for Active]
+
+  target -->|client editor| portal[Build arm64 image<br/>push to ECR]
+  portal --> ssm[SSM RunCommand on anchor]
+  ssm --> health{Health check}
+  health -->|pass| live[Advance .last-good<br/>invalidate CloudFront]
+  health -->|fail| rollback[Roll back automatically]
+
+  tf[aws-infra CI] --> staticOnly[Static validation only while drift is open<br/>no AWS identity, live plan, or auto-apply]
+
+  classDef source fill:#f8fafc,stroke:#475569,color:#111827
+  classDef aws fill:#eef2ff,stroke:#4f46e5,color:#111827
+  classDef safe fill:#ecfdf5,stroke:#059669,color:#111827
+  classDef warn fill:#fff7ed,stroke:#ea580c,color:#111827
+  class change,workflow,editor,siteRepo,runner,hosted,tf source
+  class codebuild,oidc,target,static,invalidate,lambda,activate,portal,ssm aws
+  class verify,live safe
+  class health,rollback,staticOnly warn

@@ -1,4 +1,3 @@
-%%{init: {"theme": "base", "themeVariables": {"fontFamily": "Inter, Segoe UI, Helvetica, Arial, sans-serif", "fontSize": "14px", "primaryColor": "#eef2ff", "primaryBorderColor": "#4f46e5", "primaryTextColor": "#111827", "lineColor": "#6b7280", "clusterBkg": "#f9fafb", "clusterBorder": "#d1d5db", "edgeLabelBackground": "#ffffff"}, "flowchart": {"curve": "basis", "nodeSpacing": 28, "rankSpacing": 44}}}%%
 flowchart TB
   classDef edge fill:#fff7ed,stroke:#ea580c,color:#111827
   classDef aws fill:#eef2ff,stroke:#4f46e5,color:#111827
@@ -32,7 +31,7 @@ flowchart TB
 
   subgraph ANCHOR["The anchor — one always-on box"]
     direction LR
-    ec2["EC2 t4g.medium (Graviton)<br/>Postgres + PgBouncer + Redis<br/>NAT for in-VPC Lambdas<br/>app.raizhost.com portal container"]:::aws
+    ec2["EC2 t4g.medium (Graviton)<br/>Postgres + PgBouncer + Redis<br/>NAT for in-VPC Lambdas<br/>app.raizhost.com editor container"]:::aws
   end
 
   subgraph DATA["Data & state"]
@@ -44,12 +43,12 @@ flowchart TB
 
   subgraph OPS["Operate — CI/CD, scheduling, observability"]
     direction LR
-    gha["GitHub Actions<br/>OIDC role assumption<br/>(no stored keys)"]:::ops
+    gha["GitHub Actions workflows<br/>CodeBuild ephemeral runner: app<br/>repo-scoped OIDC deploy roles"]:::ops
     ecr["ECR ×7<br/>keep-last-5"]:::ops
     ssm["SSM Session Manager<br/>+ RunCommand deploys<br/>(no open SSH)"]:::ops
     sched["EventBridge Scheduler ×11<br/>pollers · crons ·<br/>opsbox stop/start"]:::ops
     cw["CloudWatch alarms<br/>Route 53 health checks<br/>→ SNS email"]:::ops
-    tf["Terraform ~330 resources<br/>+ gated provisioning scripts"]:::ops
+    tf["Terraform core + CloudFormation runners<br/>gated provisioning scripts<br/>Terraform CI static-only while drift is open"]:::ops
   end
 
   subgraph SAAS["External services"]
@@ -67,10 +66,10 @@ flowchart TB
   lambdas --> ec2
   lambdas --> ddb
   lambdas --> secrets
-  ec2 -->|"publish sites"| s3
   ec2 -->|"nightly pg_dumpall"| s3
+  ec2 -->|"content commit"| gha
   sched --> lambdas
-  gha -->|"s3 sync + invalidate"| s3
+  gha -->|"build + s3 sync + invalidate"| s3
   gha -->|"arm64 image"| ecr --> ssm --> ec2
   ecr --> lambdas
   cw -.-> cf & lambdas & ec2

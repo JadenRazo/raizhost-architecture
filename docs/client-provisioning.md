@@ -7,34 +7,11 @@ default and mutates only on `--execute`, which trips the operations guard's appr
 node infra/new-client-site.mjs --slug <slug> --domain <domain> [--no-www] [--no-dns] [--execute]
 ```
 
-```mermaid
-sequenceDiagram
-  autonumber
-  participant Op as Operator
-  participant S as new-client-site
-  participant G as Guard hook
-  participant AWS
-  participant CFl as Cloudflare
+<p align="center">
+  <img src="../diagrams/client-provisioning.svg" alt="Client provisioning starts in read-only plan mode, prints an exact mutation manifest, and changes nothing unless the operator reruns with execute and approves the guard. It creates a versioned S3 bucket and DNS-validated certificate, stops cleanly for certificate issuance, then creates CloudFront, create-only Cloudflare records, a health check and alarm, and finally a client registry plus Terraform import map." width="100%">
+</p>
 
-  Op->>S: run (plan mode)
-  S->>AWS: describe existing resources (read-only)
-  S-->>Op: mutation manifest (what would be created, what already exists)
-  Op->>S: run again with --execute
-  S->>G: gated action
-  G-->>Op: approve?
-  Op-->>G: yes
-  S->>AWS: S3 bucket (versioning on) + scoped policy
-  S->>AWS: ACM certificate (DNS-validated, us-east-1)
-  S->>CFl: validation CNAME (create-only; never overwrites)
-  Note over S,AWS: run stops at the ACM wait — re-run when ISSUED
-  Op->>S: run again with --execute
-  S->>AWS: CloudFront Function (canonical URLs) + OAC
-  S->>AWS: CloudFront distribution from template
-  S->>CFl: site CNAME(s) → CloudFront (DNS-only)
-  S->>AWS: Route 53 health check (HTTPS, 30s)
-  S->>AWS: CloudWatch uptime alarm → SNS
-  S-->>Op: clients/<slug>.json registry + terraformImport map + paste-ready docs
-```
+<sub>Editable source: [`diagrams/client-provisioning.mmd`](../diagrams/client-provisioning.mmd). A committed SVG is embedded so the flow remains visible in GitHub's mobile clients.</sub>
 
 ## Properties that matter
 
@@ -52,6 +29,14 @@ sequenceDiagram
   pair is the delivery test.)
 
 ## After launch: content updates
+
+There are now two deployment lanes:
+
+- **Owner self-service:** `app.raizhost.com` writes allowed content and uploaded assets to the
+  client's source repository. The site's own GitHub Actions workflow builds, performs the four-pass
+  cache-control sync, and invalidates CloudFront. Git history is the restore path.
+- **RaizHost-managed changes:** structural/design work and older ops-repo sites still use the gated
+  command below. This path has a two-pass asset/HTML cache split and a deletion guard.
 
 ```text
 node infra/site-update.mjs <slug> [--execute] [--allow-delete]
