@@ -12,7 +12,7 @@ Cloudflare DNS (DNS-only CNAME) to its own CloudFront distribution; AWS hosts on
 ## Three origin types
 
 | Surface | Origin | Cold path | Notes |
-|:--|:--|:--|:--|
+| :-- | :-- | :-- | :-- |
 | Static sites (marketing, demos, client sites, status) | S3 via Origin Access Control | S3 GET | Bucket policies allow only the owning distribution(s). The demo factory is mounted on **two** hosts (`demos.raizhost.com` and `raizhost.com/demos/`) from one bucket, which is what surfaced the shared-cache-key lesson. |
 | Serverless apps (`llm.raizhost.com`, tenant apps, quote/CRM APIs) | HTTP API Gateway → Lambda | Lambda cold start (arm64 Next.js containers ~1 s; Go/Rust zip ~50 ms) | Next.js apps emit `s-maxage` so CloudFront serves HTML for most requests; Lambda sees only revalidations. |
 | Client editor (`app.raizhost.com`) | Custom origin: the anchor's editor container | none (always on) | Origin request policy forwards the required viewer headers; `X-Forwarded-Proto=https` is injected as an origin custom header. Auth pages are `no-store`; static chunks are immutable. Publishing content leaves the request path and enters the repository deploy flow. |

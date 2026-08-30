@@ -12,7 +12,7 @@ RaizHost, demo, status, portfolio, and application infrastructure.
 ## Serving now
 
 | Area | Current state |
-|:--|:--|
+| :-- | :-- |
 | Edge | 10 CloudFront distributions behind Cloudflare DNS. Static origins use S3 with Origin Access Control. |
 | Request compute | 17 arm64 Lambda functions and 9 HTTP APIs, plus one always-on `t4g.medium` anchor. Some functions are schedule-driven rather than HTTP-facing. |
 | Stateful services | The anchor runs Postgres, PgBouncer, Redis, NAT for private Lambda subnets, and the `app.raizhost.com` container. |

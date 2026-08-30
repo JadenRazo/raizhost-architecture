@@ -42,7 +42,7 @@ replaced. Two facts drove every choice: a **$100/month hard ceiling**, and the g
 **nothing should cost money while idle**.
 
 | Principle | What it means in practice |
-|:--|:--|
+| :-- | :-- |
 | **Scale-to-zero by default** | Anything request- or event-driven is serverless: CloudFront + S3, HTTP API Gateway + Lambda, DynamoDB on-demand, EventBridge Scheduler, and now ephemeral CodeBuild CI. Those layers have no idle compute fleet. |
 | **One always-on serving box, as small as possible** | A single `t4g.medium` Graviton "anchor" is the only continuously billed serving compute. It holds what genuinely can't scale to zero: consolidated Postgres, Redis, NAT for in-VPC Lambdas, and the stateful client editor. The separate ops box follows a daily stop window. |
 | **No NAT Gateway, no load balancer** | ~$32 and ~$18/mo of pure idle cost. The anchor NATs for the private subnets; API Gateway is the pay-per-request front door. |
@@ -55,7 +55,7 @@ replaced. Two facts drove every choice: a **$100/month hard ceiling**, and the g
 ## What we use, and why
 
 | Layer | Choice | Why this and not the obvious alternative |
-|:--|:--|:--|
+| :-- | :-- | :-- |
 | **DNS** | **Cloudflare** (DNS-only CNAMEs to CloudFront) | Free DNSSEC and email routing; cutover is a record swap with fast rollback. Route 53 has no hosted zones here and is used only for health checks. |
 | **Edge / TLS** | **CloudFront** ×10, PriceClass_100, ACM certs | One distribution per surface/domain group. CloudFront Functions handle trailing-slash canonicalization and bot blocking at the edge, so bad traffic never reaches an origin or a bill. |
 | **Static sites** | **S3** origins behind Origin Access Control | The product *is* a fast static site. `aws s3 sync` + invalidation is the whole deploy. A four-pass sync sets distinct `cache-control` per asset class (hashed assets immutable for a year, HTML `must-revalidate`). |
@@ -112,7 +112,7 @@ measurement was about $106/month with the ops box running continuously; the sche
 still needs a clean Cost Explorer re-measure.
 
 | Slice | $/month | Notes |
-|:--|--:|:--|
+| :-- | --: | :-- |
 | Anchor EC2 `t4g.medium` compute | ~$25 | The only always-on serving compute; storage and IPv4 sit in the shared core remainder |
 | Serverless, edge, storage, IPv4, secrets, monitoring, Config, snapshots | ~$25 | Traffic-sensitive; Config is still under review |
 | **Serving core** | **~$50** | The old public headline stopped here |

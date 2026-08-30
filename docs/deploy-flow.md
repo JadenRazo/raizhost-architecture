@@ -15,7 +15,7 @@ must still assume its narrower deploy role.
 ## Why three shapes
 
 | Target | Mechanism | Why |
-|:--|:--|:--|
+| :-- | :-- | :-- |
 | **Static sites** | `aws s3 sync` in ordered passes + one invalidation | The order matters: HTML goes last so it never references an asset that isn't uploaded yet, and a final `--delete` pass runs *after* invalidation so cached HTML can still find the old hashed assets it points to. `--size-only` is banned because sync only stamps cache-control on objects it uploads. |
 | **Lambda apps** | Image push + `update-function-code` | Immutable images, instant rollback by pointing at the previous tag. Images are built arm64 in CI so Graviton Lambdas never run under emulation. |
 | **Client editor** | SSM RunCommand executing an on-box `deploy.sh` | The editor is stateful and lives on the anchor. SSM gives an audited, IAM-scoped way to run the deploy without opening SSH. The script is health-gated with automatic rollback, and the on-box files are tracked in the app repo with a read-only drift check that runs after every deploy. |
