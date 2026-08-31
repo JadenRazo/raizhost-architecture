@@ -13,32 +13,32 @@ jobs:
     name: lint markdown + render diagram
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v24.2.0
+        uses: DavidAnson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
         with:
           globs: |
             **/*.md
             !node_modules
 
       - name: Render architecture source (fails on syntax errors)
-        uses: docker://minlag/mermaid-cli:11.4.2
+        uses: docker://minlag/mermaid-cli@sha256:99c983b3ab4e14033f2880bc1b9de17e5090b4515dabd63fe9cf8c0ae6130956 # 11.4.2
         with:
           args: -i diagrams/architecture.mmd -o /tmp/architecture.svg -c diagrams/mermaid-config.json -b transparent
 
       - name: Render request-flow source
-        uses: docker://minlag/mermaid-cli:11.4.2
+        uses: docker://minlag/mermaid-cli@sha256:99c983b3ab4e14033f2880bc1b9de17e5090b4515dabd63fe9cf8c0ae6130956 # 11.4.2
         with:
           args: -i diagrams/request-flow.mmd -o /tmp/request-flow.svg -c diagrams/mermaid-config.json -b transparent
 
       - name: Render deploy-flow source
-        uses: docker://minlag/mermaid-cli:11.4.2
+        uses: docker://minlag/mermaid-cli@sha256:99c983b3ab4e14033f2880bc1b9de17e5090b4515dabd63fe9cf8c0ae6130956 # 11.4.2
         with:
           args: -i diagrams/deploy-flow.mmd -o /tmp/deploy-flow.svg -c diagrams/mermaid-config.json -b transparent
 
       - name: Render client-provisioning source
-        uses: docker://minlag/mermaid-cli:11.4.2
+        uses: docker://minlag/mermaid-cli@sha256:99c983b3ab4e14033f2880bc1b9de17e5090b4515dabd63fe9cf8c0ae6130956 # 11.4.2
         with:
           args: -i diagrams/client-provisioning.mmd -o /tmp/client-provisioning.svg -c diagrams/mermaid-config.json -b transparent
 
