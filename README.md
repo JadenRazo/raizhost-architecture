@@ -129,15 +129,16 @@ schedule pair silently missed a morning start, so the box was off 20 h/day inste
 
 ## Operating the platform
 
-Operations live in a private `raizhost-operations` repo that is both the knowledge base and the
-**agent system** the platform is run with:
+Operations live in a private `raizhost-operations` repo that serves as the knowledge base and
+automation control plane:
 
 - **Knowledge base as canon.** Every live-system fact has exactly one home. The AWS map carries a
   *"last verified / verify by"* header; a doc past its date is a claim, not a fact, until re-checked
   against a read-only AWS sweep (`infra-truth-check`).
-- **Specialized agents, not one big prompt.** ~18 Claude Code subagents — foreman, demo-builder,
-  demo-critic, mobile-qa, fact-checker, infra-truth-check, doc-steward, lead-scout, and so on — each
-  own one job. A second engine (Codex) shares the same skill files through a quota-aware router.
+- **Human-owned, AI-assisted workflows.** Source-controlled task instructions constrain research,
+  implementation, fact checking, and QA performed with Claude Code or Codex. The tools can propose
+  and execute scoped work; the operator owns the decision, approves side effects, and verifies the
+  result. Tool activity is not treated as production evidence by itself.
 - **A guard hook, not a wiki rule.** A `PreToolUse` hook classifies every command. Deploys,
   DNS writes, VPS writes, git pushes and anything that moves money surface as an explicit
   in-session approval prompt; read-only work runs free. "If a rule is worth having it is worth
