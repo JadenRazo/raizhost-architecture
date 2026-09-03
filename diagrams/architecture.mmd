@@ -43,6 +43,7 @@ flowchart TB
 
   subgraph OPS["Operate — CI/CD, scheduling, observability"]
     direction LR
+    siteRepo["Client site repositories<br/>source-controlled content"]:::ops
     gha["GitHub Actions workflows<br/>CodeBuild ephemeral runner: app<br/>repo-scoped OIDC deploy roles"]:::ops
     ecr["ECR ×7<br/>keep-last-5"]:::ops
     ssm["SSM Session Manager<br/>+ RunCommand deploys<br/>(no open SSH)"]:::ops
@@ -67,7 +68,7 @@ flowchart TB
   lambdas --> ddb
   lambdas --> secrets
   ec2 -->|"nightly pg_dumpall"| s3
-  ec2 -->|"content commit"| gha
+  ec2 -->|"editor content commit"| siteRepo --> gha
   sched --> lambdas
   gha -->|"build + s3 sync + invalidate"| s3
   gha -->|"arm64 image"| ecr --> ssm --> ec2

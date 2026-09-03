@@ -48,7 +48,11 @@ jobs:
       - name: Diagram geometry check (text fits boxes, no line crosses text)
         run: |
           pip install --quiet fonttools brotli
-          python3 diagrams/check.py diagrams/architecture.svg
+          python3 diagrams/check.py
+          if python3 diagrams/check.py ../../etc/passwd; then
+            echo "::error::Geometry checker accepted a file-path override"
+            exit 1
+          fi
 
       - name: Check for private identifiers
         run: |
