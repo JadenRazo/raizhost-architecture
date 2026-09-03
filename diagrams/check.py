@@ -4,7 +4,10 @@ Uses the Inter subsets embedded in the SVG to measure every <text> run with the
 exact metrics browsers will use, then fails if any text overflows its box, any
 line segment crosses any text, or two text runs overlap.
 
-    pip install fonttools brotli && python3 diagrams/check.py diagrams/architecture.svg
+The target is intentionally fixed to the adjacent architecture.svg file. This
+checker accepts no file-path arguments.
+
+    pip install fonttools brotli && python3 diagrams/check.py
 """
 
 import base64
@@ -13,11 +16,47 @@ import io
 import math
 import re
 import sys
+from pathlib import Path
 
 from fontTools.ttLib import TTFont
 
-SVG = sys.argv[1]
-_svg = open(SVG, encoding="utf-8").read()
+
+SVG_FILENAME = "architecture.svg"
+DIAGRAMS_DIRECTORY = Path(__file__).resolve().parent
+
+
+def read_architecture_svg():
+    """Read the one repository-controlled SVG this checker is designed for."""
+    if len(sys.argv) != 1:
+        raise SystemExit(
+            "usage: python3 diagrams/check.py\n"
+            "file-path arguments are rejected; the checker only reads "
+            "diagrams/architecture.svg"
+        )
+
+    unresolved_path = DIAGRAMS_DIRECTORY / SVG_FILENAME
+    if unresolved_path.is_symlink():
+        raise SystemExit("refusing to read architecture.svg through a symbolic link")
+
+    try:
+        svg_path = unresolved_path.resolve(strict=True)
+    except OSError as error:
+        raise SystemExit(f"cannot resolve {unresolved_path}: {error}") from error
+
+    try:
+        svg_path.relative_to(DIAGRAMS_DIRECTORY)
+    except ValueError as error:
+        raise SystemExit(
+            "refusing to read architecture.svg outside the diagrams directory"
+        ) from error
+
+    if svg_path.name != SVG_FILENAME or not svg_path.is_file():
+        raise SystemExit("diagrams/architecture.svg is not a regular SVG file")
+
+    return svg_path.read_text(encoding="utf-8")
+
+
+_svg = read_architecture_svg()
 fonts = {}
 for match in re.finditer(
     r"font-weight:(\d+);src:url\(data:font/woff2;base64,([A-Za-z0-9+/=]+)\)",
