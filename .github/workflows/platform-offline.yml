@@ -1,0 +1,32 @@
+name: Platform offline checks
+
+on:
+  pull_request:
+    paths:
+      - "platform/**"
+      - ".github/workflows/platform-offline.yml"
+  push:
+    branches: [main]
+    paths:
+      - "platform/**"
+      - ".github/workflows/platform-offline.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platform-offline-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; same pin as repository CI
+        with:
+          persist-credentials: false
+      - name: Cost and plan-triage regression tests (no AWS calls)
+        run: python3 -m unittest discover -s platform -p 'test_*.py' -v
+      - name: Verify cost calculator CLI
+        run: python3 platform/cost_model.py
