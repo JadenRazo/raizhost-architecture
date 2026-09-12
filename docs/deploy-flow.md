@@ -1,6 +1,6 @@
 # Deployment flow
 
-[System overview](../README.md) · [Owner publication](app-raizhost-com.md) · [Current evidence](current-state.md)
+[System overview](../README.md) · [Owner publication](owner-publishing.md) · [Client CI/CD](client-site-cicd.md) · [Current evidence](current-state.md)
 
 Each repository owns its release workflow. GitHub Actions uses OpenID Connect (OIDC) to
 assume a scoped AWS role. Runner permissions and deployment permissions are distinct:
@@ -21,7 +21,7 @@ access. This page follows the artifacts after a release is selected.
 | `raizhost.com` | Manual dispatch with exact `commit_sha` and `approve_production` | Astro `dist/` → S3 → CloudFront invalidation | Revision binding and website checks in workflow; inspect live output after release |
 | `app.raizhost.com` | Successful same-repository **push CI on main** | CI-built ARM64 image → ECR → anchor via SSM | Additive migrations, health gate, rollback on rejected rollout, ops-file drift check |
 | `llm.raizhost.com` | Successful CI on main, or manual deployment dispatch | Web image → ECR/Lambda; static bundles → S3; shared ZIP → all three poller Lambdas | Lambda update results, tier invocations, CDN invalidation, live data and feed smoke checks |
-| Connected client website | Commit to its configured live or preview branch | Site build → appropriate S3 root/prefix → invalidation | The exact site workflow's checks; portal tracks the content commit's run |
+| Connected client website | Push to its configured live or preview branch | Site build → appropriate S3 root/prefix → invalidation | [Showers example](client-site-cicd.md): Action pins, unit tests, build, target HTTP HEAD; portal tracks the exact content run |
 | Quote and CRM APIs | Separate function deployment commands | Function ZIP/configuration → respective Lambda | Function-specific checks; not included in the static website deploy |
 
 This table describes triggers, not blanket permission to run them. An app main merge can
@@ -41,6 +41,10 @@ additive database migrations.
 An owner pressing Publish follows another path: the portal creates a content commit in
 the **client's repository**. That repository builds the public site. It does not redeploy
 the portal, and the portal does not compile the connected site's pages.
+
+Follow the [button-to-live sequence](owner-publishing.md#follow-the-handoff) and
+[client pipeline diagram](client-site-cicd.md#what-must-pass-before-output-is-written) for
+the actual handoff and every stage after that commit.
 
 ## Tracker web and collection code ship together
 

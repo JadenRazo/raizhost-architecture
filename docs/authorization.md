@@ -20,6 +20,15 @@ protection rules** configured in the 2026-09-12 API read. The portal and tracker
 do not declare a GitHub environment gate. The [CI/CD guide](ci-cd.md) records their actual
 branch checks and triggering conditions.
 
+For a routine owner content publication, the user's confirmation and the portal's server
+checks authorize the action. Showers' client workflow has no additional staff-approval,
+PR-merge or GitHub environment step for each click. Trace its two credential handoffs—
+portal to GitHub, then workflow to AWS—in the [owner walkthrough](owner-publishing.md#which-credentials-cross-the-handoff).
+Repository branch policy still controls whether the portal's credential may push directly.
+The [Showers gate read](current-state.md#owner-publication-evidence) found a main-branch PR
+policy with administrators exempt; successful admin writes do not establish installation-wide
+bypass permission.
+
 ## Deployment identity
 
 <p align="center">
@@ -89,7 +98,8 @@ Save stores a Postgres draft. Preview/live publication creates a GitHub commit u
 server's configured source credential; the client repository's workflow deploys the output.
 Only its matching successful run confirms publication. A committed update can remain
 unconfirmed during a GitHub outage. [Open the portal gate diagram](../diagrams/portal-authorization.svg)
-and follow the [publication lifecycle](app-raizhost-com.md#save-preview-and-publish).
+and follow the [publication lifecycle](owner-publishing.md#follow-the-handoff) and
+[status guarantees](publish-status.md).
 
 ## Other application boundaries
 

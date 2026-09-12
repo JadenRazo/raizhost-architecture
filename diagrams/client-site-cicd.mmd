@@ -1,0 +1,32 @@
+---
+config:
+  flowchart:
+    wrappingWidth: 320
+---
+flowchart LR
+  subgraph validation["1. SHOWERS — VALIDATE AND BUILD"]
+    direction TB
+    start["Deploy workflow<br/>Push: main / preview; or manual dispatch"]
+    start --> source["Check out run revision<br/>Set up Node 22"]
+    source --> checks["Verify Action pins → npm ci<br/>Run unit tests"]
+    checks --> target{"Target from branch"}
+    target -->|"main"| live["PREVIEW=0<br/>S3 root; invalidate /*<br/>Smoke: public root"]
+    target -->|"other ref"| preview["PREVIEW=1<br/>S3 _preview/; invalidate /_preview/*<br/>Smoke: preview root"]
+    live --> build["Astro build → dist/<br/>Import content.json; apply base path"]
+    preview --> build
+  end
+  subgraph publication["2. DEPLOY AND VERIFY"]
+    direction TB
+    oidc["GitHub OIDC → AWS role<br/>Trust + operation permissions"]
+    oidc --> assets["1. Hashed assets: immutable, one year<br/>2. Images / fonts / uploads: 30 days"]
+    assets --> html["3. HTML + metadata: revalidate<br/>4. Delete removed HTML only<br/>Preserve assets and preview tree"]
+    html --> cdn["Request CloudFront invalidation<br/>No completion wait"]
+    cdn --> smoke["HTTP HEAD of selected root<br/>Up to six attempts; no body assertion"]
+    smoke --> result["Workflow result for this SHA + branch<br/>Portal reconciles publication status"]
+  end
+  validation -->|"Build must succeed"| publication
+
+  classDef gate fill:#fff7ed,stroke:#c2410c,color:#172b35
+  classDef output fill:#ecfdf5,stroke:#047857,color:#172b35
+  class target,oidc gate
+  class assets,html,cdn,result output

@@ -1,0 +1,27 @@
+stateDiagram-v2
+  direction TB
+  [*] --> queued: Git commit and tracking row recorded
+  queued --> building: Matching run is in progress
+  queued --> live: Matching run succeeded
+  building --> live: Matching run succeeded
+  queued --> failed: Confirmed failure or absence timeout
+  building --> failed: Confirmed unsuccessful run or absence timeout
+  state "live (terminal)" as live
+  state "failed (terminal)" as failed
+
+  note right of queued
+    Unavailable lookup: retain last state.
+    Confirmed absence can fail after 10 minutes.
+    Source SHA, branch and workflow must match.
+  end note
+  note right of live
+    Live-kind: workflow reports live deployment.
+    Preview-kind: preview ready.
+    Verify the edited page separately.
+  end note
+  note right of failed
+    Failure can follow partial S3 writes.
+    Retry handoff or identity can also fail.
+    Eligible retry creates a new tracking row.
+    Terminal records do not reopen.
+  end note

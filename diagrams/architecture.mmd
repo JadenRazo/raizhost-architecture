@@ -22,10 +22,10 @@ flowchart LR
   tracker_db["PgBouncer → Postgres<br/>Tracker database on anchor"]:::data
   bundles["Private S3 assets<br/>/_next/static/*"]:::data
   pollers["Scheduled poller Lambdas<br/>EventBridge invokes three tiers<br/>Fetch sources; normalize records"]:::runtime
-  publish["Owner presses Publish<br/>Portal validates content"]:::source
-  repo["Client repository<br/>Content + image commit"]:::source
-  build["Client site workflow<br/>Build + upload + invalidate"]:::runtime
-  output["S3 site output<br/>CloudFront serves visitors"]:::data
+  publish["Preview or Publish<br/>Save + authorize + validate"]:::source
+  repo["Client repository<br/>Content JSON commit<br/>Selected branch push"]:::source
+  build["Client site workflow<br/>Checks + build + AWS writes"]:::runtime
+  output["S3 + CloudFront<br/>Preview prefix or public site"]:::data
   sites --> site_cf
   site_cf --> site_s3
   forms --> quote_api

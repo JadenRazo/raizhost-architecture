@@ -25,6 +25,24 @@ Start with the map, then follow an application from a user action to its stored 
 > recovery were not reverified. [Current state and evidence](docs/current-state.md) records
 > the exact revisions and the limits of those checks.
 
+## Start with the action
+
+| What happened? | Follow this path |
+| :-- | :-- |
+| An owner changed opening hours and pressed Preview or Publish | [Button → draft → Git commit → client build → public result](docs/owner-publishing.md) |
+| The client website is building or an update looks stuck | [Client CI/CD stages](docs/client-site-cicd.md), then [status and recovery](docs/publish-status.md) |
+| A developer changed the portal, marketing site or tracker | [Application code CI/CD](docs/ci-cd.md) → [deployment identity](docs/authorization.md) → [release verification](docs/release-verification.md) |
+| A visitor opens a page or submits an inquiry | [Request routing](docs/request-flow.md) and [website APIs](docs/raizhost-com.md) |
+| A provider releases an LLM update | [Scheduled collection → database → dashboard / RSS](docs/llm-raizhost-com.md) |
+| A new client needs hosting and owner access | [Provisioning and content-source connection](docs/client-provisioning.md) |
+
+For example, **Publish in the owner portal** saves the latest draft, checks permission and
+source revisions, and commits content to the **client site's repository**. That branch push
+starts the site's checks and build, followed by S3 uploads, CloudFront invalidation and its
+post-deploy checks. The portal polls the matching workflow before reporting its result.
+The [walkthrough](docs/owner-publishing.md) shows each handoff, including HTTP 202, preview
+versus live branches, and what a green workflow can actually prove.
+
 ## The system at a glance
 
 <p align="center">
@@ -43,8 +61,10 @@ Cloudflare supplies DNS answers; the browser's HTTPS connection goes to CloudFro
    Its Lambda validates and stores the submission in DynamoDB, then attempts email through
    Resend. The saved inquiry and the email outcome are separate records of success.
 3. **Edit a client site.** CloudFront forwards authenticated portal requests to the Next.js
-   container on the anchor. Save writes a Postgres draft. Publish creates a content commit
-   in the client's repository; that repository's workflow builds and deploys the website.
+   container on the anchor. Save writes a Postgres draft. Built Preview and Publish commit
+   content to different client branches. The client workflow builds and deploys to the
+   selected destination; the portal reconciles the exact content commit's workflow result.
+   [Trace the owner-to-live path](docs/owner-publishing.md).
 4. **Read LLM updates.** CloudFront sends uncached dashboard requests through API Gateway
    to the web Lambda. It reads collected data through PgBouncer into Postgres. Hashed
    browser bundles take a separate S3 path.
@@ -57,7 +77,7 @@ Cloudflare supplies DNS answers; the browser's HTTPS connection goes to CloudFro
 | State | Home | Why the distinction matters |
 | :-- | :-- | :-- |
 | Published website files | S3, cached by CloudFront | Visitors read built output; they do not query portal drafts |
-| Client website design, content contract, and published revisions | Each client's Git repository | The app changes allowed content; the site's build owns HTML and layout |
+| Client website design, content contract, and committed revisions | Each client's Git repository | The app changes allowed content; a committed source revision still needs deployment |
 | Accounts, tenant membership, active drafts, and publish tracking | Portal's Postgres database | Saving and tracking an update are separate from deploying it |
 | Provider events, model/reference records, and poller outcomes | Tracker's Postgres database | Dashboard requests read collected data rather than fetching every provider |
 | Quotes and CRM records | Separate DynamoDB tables | Lead capture has no Postgres dependency |
@@ -74,11 +94,14 @@ database reads, and scheduled collection. Static website delivery follows its ow
 | Guide | Question it answers |
 | :-- | :-- |
 | [Request flow](docs/request-flow.md) | Which origin handles a URL, and where does caching happen? |
-| [Owner portal](docs/app-raizhost-com.md) | What changes when someone saves, previews, or publishes? |
+| [Owner portal](docs/app-raizhost-com.md) | Where does the editor run, and how is it connected to a client site? |
+| [Owner-to-live walkthrough](docs/owner-publishing.md) | What exactly happens after Preview or Publish, including photos and branch behavior? |
+| [Client website CI/CD](docs/client-site-cicd.md) | What tests, build, AWS writes and verification run for an owner's content commit? |
+| [Publication status](docs/publish-status.md) | How does the result reach the portal, and what happens if confirmation or deployment fails? |
 | [LLM Tracker](docs/llm-raizhost-com.md) | Where does the data come from, and how does it reach a page? |
 | [Website and inquiries](docs/raizhost-com.md) | How do the static website, quote form, and CRM work together? |
 | [Deployment flow](docs/deploy-flow.md) | Which workflows release each application? |
-| [CI/CD](docs/ci-cd.md) | What runs on a PR, which checks block merging, and what selects a release? |
+| [Application code CI/CD](docs/ci-cd.md) | What runs on a PR, which checks block merging, and what selects an application release? |
 | [Authorization gates](docs/authorization.md) | Who may release code, obtain AWS permissions, or change a client's content? |
 | [Release verification and recovery](docs/release-verification.md) | What proves a rollout succeeded, and what happens after a partial failure? |
 | [Client provisioning](docs/client-provisioning.md) | How does a client get hosting and an editable site? |

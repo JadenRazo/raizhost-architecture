@@ -16,7 +16,7 @@ text{font-family:Inter,sans-serif;fill:#172b35}.h{font-size:16px;font-weight:600
 <text x="28" y="358" class="bandt">02  Submit or manage an inquiry</text>
 <text x="28" y="498" class="bandt">03  Use the owner portal</text>
 <text x="28" y="638" class="bandt">04  Read LLM updates</text>
-<text x="28" y="988" class="bandt">05  Publish an owner&#x27;s content update</text>
+<text x="28" y="988" class="bandt">05  Build a preview or publish an owner&#x27;s update</text>
 <rect class="box source" x="28" y="234" width="236" height="80" rx="8" fill="#f8fafc" stroke="#64748b"/>
 <text x="146.0" y="269.0" class="h" text-anchor="middle">raizhost.com</text>
 <text x="146.0" y="290.0" class="s" text-anchor="middle">Client sites and demos</text>
@@ -70,17 +70,18 @@ text{font-family:Inter,sans-serif;fill:#172b35}.h{font-size:16px;font-weight:600
 <text x="952.0" y="837.5" class="s" text-anchor="middle">EventBridge invokes three tiers</text>
 <text x="952.0" y="858.5" class="s" text-anchor="middle">Fetch sources; normalize records</text>
 <rect class="box source" x="28" y="1004" width="236" height="90" rx="8" fill="#f8fafc" stroke="#64748b"/>
-<text x="146.0" y="1044.0" class="h" text-anchor="middle">Owner presses Publish</text>
-<text x="146.0" y="1065.0" class="s" text-anchor="middle">Portal validates content</text>
+<text x="146.0" y="1044.0" class="h" text-anchor="middle">Preview or Publish</text>
+<text x="146.0" y="1065.0" class="s" text-anchor="middle">Save + authorize + validate</text>
 <rect class="box source" x="304" y="1004" width="188" height="90" rx="8" fill="#f8fafc" stroke="#64748b"/>
-<text x="398.0" y="1044.0" class="h" text-anchor="middle">Client repository</text>
-<text x="398.0" y="1065.0" class="s" text-anchor="middle">Content + image commit</text>
+<text x="398.0" y="1033.5" class="h" text-anchor="middle">Client repository</text>
+<text x="398.0" y="1054.5" class="s" text-anchor="middle">Content JSON commit</text>
+<text x="398.0" y="1075.5" class="s" text-anchor="middle">Selected branch push</text>
 <rect class="box runtime" x="532" y="1004" width="240" height="90" rx="8" fill="#eff6ff" stroke="#2563eb"/>
 <text x="652.0" y="1044.0" class="h" text-anchor="middle">Client site workflow</text>
-<text x="652.0" y="1065.0" class="s" text-anchor="middle">Build + upload + invalidate</text>
+<text x="652.0" y="1065.0" class="s" text-anchor="middle">Checks + build + AWS writes</text>
 <rect class="box data" x="812" y="1004" width="280" height="90" rx="8" fill="#ecfdf5" stroke="#047857"/>
-<text x="952.0" y="1044.0" class="h" text-anchor="middle">S3 site output</text>
-<text x="952.0" y="1065.0" class="s" text-anchor="middle">CloudFront serves visitors</text>
+<text x="952.0" y="1044.0" class="h" text-anchor="middle">S3 + CloudFront</text>
+<text x="952.0" y="1065.0" class="s" text-anchor="middle">Preview prefix or public site</text>
 <path class="l" d="M264 274 L304 274"/>
 <path class="l" d="M492 274 L532 274"/>
 <path class="l" d="M264 414 L304 414"/>
@@ -109,5 +110,5 @@ text{font-family:Inter,sans-serif;fill:#172b35}.h{font-size:16px;font-weight:600
 <text x="76" y="1140" class="lbl">Request / data access</text>
 <path class="ld" d="M264 1136 L300 1136"/>
 <text x="312" y="1140" class="lbl">Scheduled work / publication</text>
-<text x="28" y="1170" font-size="12">RaizHost architecture · source and evidence scope: docs/current-state.md</text>
+<text x="28" y="1170" font-size="12">Publication status: portal polls the exact client workflow run. Full path: docs/owner-publishing.md</text>
 </svg>
