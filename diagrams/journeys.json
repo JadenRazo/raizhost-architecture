@@ -1,0 +1,284 @@
+{
+  "owner-publishing": {
+    "title": "From Publish to the website",
+    "subtitle": "Follow the owner action. Preview uses the same handoff with a different target.",
+    "footer": "A successful workflow confirms its checks. Verify the edited page separately.",
+    "stages": [
+      {
+        "actor": "OWNER + PORTAL",
+        "title": "Confirm and finish saving",
+        "detail": "The owner confirms Preview or Publish. The editor saves the latest draft before submitting it."
+      },
+      {
+        "actor": "PORTAL",
+        "title": "Check permission and content",
+        "detail": "Check the session, tenant, write role, billing when enabled, fields, draft revision and source head.",
+        "stop": "If a check rejects the request, resolve it before publishing."
+      },
+      {
+        "actor": "PORTAL → GITHUB",
+        "title": "Commit to the client repository",
+        "detail": "Write content.json to the selected branch. GitHub must accept the credential, branch policy and source head.",
+        "note": "Preview resets its branch to the checked live source. Publish writes a fresh live commit."
+      },
+      {
+        "actor": "INDEPENDENT WORK",
+        "title": "Track the update and run the release",
+        "branches": [
+          {
+            "actor": "PORTAL",
+            "title": "Acknowledge the submission",
+            "detail": "Record the commit and publish ID, then return HTTP 202. This is not a deployment result."
+          },
+          {
+            "actor": "CLIENT WORKFLOW",
+            "title": "Build and deploy the site",
+            "detail": "The branch push starts checks, the site build, S3 uploads, CDN invalidation and the site's smoke check.",
+            "observe": true
+          }
+        ],
+        "note": "These tasks overlap. GitHub can keep deploying if portal confirmation fails."
+      },
+      {
+        "actor": "BROWSER → PORTAL → GITHUB",
+        "title": "Check the matching workflow",
+        "detail": "After acknowledgement, the browser polls while pending. The portal matches the content SHA, branch and workflow, even while the build is running."
+      },
+      {
+        "actor": "OWNER",
+        "title": "Read the result",
+        "detail": "See queued, building, preview ready, live or failed. An unavailable lookup keeps the last confirmed state.",
+        "note": "Preview ready means the review site is built; it does not promote the public site."
+      }
+    ]
+  },
+  "client-provisioning": {
+    "title": "Five stages to owner handoff",
+    "subtitle": "Hosting, site integration and owner handoff are separate stages.",
+    "footer": "Hosting resources alone do not mean the website or owner access is ready.",
+    "stages": [
+      {
+        "actor": "RAIZHOST OPERATIONS",
+        "title": "Inspect and approve the plan",
+        "detail": "Read existing hosting and DNS, then review the exact changes. The default command only plans.",
+        "stop": "Make changes only after their effects are authorized."
+      },
+      {
+        "actor": "PROVISIONING SCRIPT",
+        "title": "Create storage and validate HTTPS",
+        "detail": "Create the private, versioned S3 bucket. Request an ACM certificate and supply its DNS validation records.",
+        "stop": "If the certificate is still pending, stop and rerun after it is issued. Existing resources are detected."
+      },
+      {
+        "actor": "PROVISIONING SCRIPT",
+        "title": "Connect delivery, DNS and monitoring",
+        "detail": "Set up CloudFront, origin access and the bucket policy. Add site DNS, health checks and alerts; record the resource map.",
+        "note": "Standard path: Cloudflare DNS and Route 53 health monitoring. Resolve conflicts or finish manual DNS before handoff."
+      },
+      {
+        "actor": "SITE REPOSITORY + PORTAL",
+        "title": "Connect the editable website",
+        "detail": "Provide the content contract and client build workflow. Configure the tenant's repository, credentials, branches, paths and URLs."
+      },
+      {
+        "actor": "RAIZHOST + SITE OWNER",
+        "title": "Verify the handoff",
+        "detail": "Check the public site, preview target, owner access, saving and publication status. Verify monitoring delivery as well.",
+        "note": "Preview uses its own prefix and noindex. Noindex does not authenticate viewers."
+      }
+    ]
+  },
+  "portal-authorization": {
+    "title": "Who can change a website?",
+    "subtitle": "The server checks each gate. Continue only when it passes.",
+    "footer": "A visible button is not authorization. The server applies the same checks to direct API calls.",
+    "stages": [
+      {
+        "actor": "AUTHENTICATION",
+        "title": "Validate the session",
+        "detail": "Better Auth identifies the caller.",
+        "stop": "401: no valid session. Sign in."
+      },
+      {
+        "actor": "WEBSITE ACCESS",
+        "title": "Find an accessible tenant and source",
+        "detail": "Platform admins can access tenants. Other users must have a membership for this website.",
+        "stop": "404: tenant, membership or connected content source is unavailable."
+      },
+      {
+        "actor": "WRITE ACCESS",
+        "title": "Require an editing role",
+        "detail": "Allow a platform admin or a tenant editor/owner.",
+        "stop": "403: a viewer cannot write."
+      },
+      {
+        "actor": "CONDITIONAL BILLING GATE",
+        "title": "Check whether editing is allowed",
+        "detail": "When billing is enabled, non-admin writes require canEdit. Admins bypass this check.",
+        "stop": "402: editing is billing-locked. Disabling billing skips this gate."
+      },
+      {
+        "actor": "CONTENT SERVICE",
+        "title": "Validate the requested change",
+        "detail": "Apply field permissions, action validation, draft revision and source-head checks. Publish requires an explicit preview/live target.",
+        "stop": "Return the relevant field, conflict, target or rate-limit error."
+      },
+      {
+        "actor": "ACCEPTED ACTION",
+        "title": "Save a draft or submit a publication",
+        "branches": [
+          {
+            "actor": "SAVE",
+            "title": "Write Postgres",
+            "detail": "Store the draft. The public website does not change."
+          },
+          {
+            "actor": "PREVIEW / PUBLISH",
+            "title": "Write the client repository",
+            "detail": "GitHub must accept the branch write. The client workflow deploys; the portal tracks its result."
+          }
+        ],
+        "note": "These are alternative actions. Save can retain an incomplete draft; publication requires valid content."
+      }
+    ]
+  },
+  "deployment-identity": {
+    "title": "How a release gets AWS permission",
+    "subtitle": "Passing CI, running a job and being allowed to write are different gates.",
+    "footer": "IAM checks each operation. A later denial does not undo earlier writes.",
+    "stages": [
+      {
+        "actor": "GITHUB WORKFLOW",
+        "title": "Select an eligible release job",
+        "detail": "The repository's event and revision conditions choose the release and its runner.",
+        "note": "Portal CodeBuild runner permissions cover its connection and logs; deployment uses a separate role."
+      },
+      {
+        "actor": "GITHUB",
+        "title": "Issue an identity token",
+        "detail": "The job requests an OIDC token using id-token: write. This permission does not grant an AWS action."
+      },
+      {
+        "actor": "AWS STS",
+        "title": "Check the role's trust policy",
+        "detail": "Validate the token's issuer, audience and subject before issuing temporary deploy-role credentials.",
+        "stop": "Rejected trust: no deploy-role session."
+      },
+      {
+        "actor": "AWS IAM",
+        "title": "Authorize the operation",
+        "detail": "Check the requested action and resource against the applicable policies.",
+        "stop": "Denied action: that operation fails. Inspect any writes that already completed."
+      },
+      {
+        "actor": "RELEASE WORKFLOW",
+        "title": "Write and verify the release",
+        "detail": "Run the permitted S3, ECR, Lambda, SSM or CDN steps. Complete the application's own release checks.",
+        "note": "Credential exchange is permission evidence, not proof of human approval or a successful release."
+      }
+    ]
+  },
+  "portal-rollout": {
+    "title": "Release the portal container",
+    "subtitle": "This updates app.raizhost.com code. Owner content uses the client workflow.",
+    "footer": "A rejected release stays failed even if recovery restores a healthy previous image.",
+    "stages": [
+      {
+        "actor": "DEPLOY WORKFLOW",
+        "title": "Select the successful CI revision",
+        "detail": "Deploy the exact head SHA whose eligible push CI built the portal image."
+      },
+      {
+        "actor": "SSM + ANCHOR",
+        "title": "Prepare the release",
+        "detail": "Install and verify the reviewed deploy script. Apply only the allowlisted additive migrations.",
+        "stop": "Preparation failure stops the release before switching the container. Inspect completed preparation steps."
+      },
+      {
+        "actor": "ANCHOR",
+        "title": "Start the candidate image",
+        "detail": "Refresh the environment, pull the SHA-tagged image and start the candidate container."
+      },
+      {
+        "actor": "ROLLOUT CHECK",
+        "title": "Check image identity and health",
+        "detail": "Confirm the expected image is running and the container is healthy."
+      },
+      {
+        "actor": "HEALTH RESULT",
+        "title": "Accept the release or recover",
+        "branches": [
+          {
+            "actor": "HEALTH PASSES",
+            "title": "Accept the candidate",
+            "detail": "Record the last-good SHA, request best-effort CDN invalidation, and require terminal SSM Success."
+          },
+          {
+            "actor": "START / HEALTH FAILS",
+            "title": "Try the previous image",
+            "detail": "Use a valid, distinct last-good SHA if available. Start it and check its identity and health. Keep additive migrations."
+          }
+        ],
+        "note": "These are alternative outcomes. No eligible image or failed recovery means recovery is unconfirmed."
+      }
+    ]
+  },
+  "publish-status": {
+    "title": "What a publication status means",
+    "subtitle": "Match the content commit, branch and workflow. A missed observation can skip an intermediate state.",
+    "flow": false,
+    "footer": "Unavailable lookup: retain the last confirmed state. It is not a new success or failure.",
+    "stages": [
+      {
+        "id": "queued",
+        "actor": "QUEUED",
+        "title": "Submission recorded",
+        "detail": "The content commit and tracking row exist. The run may still be waiting to appear.",
+        "note": "Next confirmed state can be building, live or failed."
+      },
+      {
+        "id": "building",
+        "actor": "BUILDING",
+        "title": "The matching run is in progress",
+        "detail": "Checks, uploads and verification can still fail.",
+        "note": "Next confirmed state can be live or failed."
+      },
+      {
+        "id": "live",
+        "actor": "LIVE · TERMINAL",
+        "title": "The matching workflow succeeded",
+        "detail": "For preview-kind, this means preview ready. For live-kind, the workflow reports a live deployment.",
+        "note": "Verify the changed page separately. Workflow success proves only the checks that ran."
+      },
+      {
+        "id": "failed",
+        "actor": "FAILED · TERMINAL",
+        "title": "A failure was confirmed",
+        "detail": "An unsuccessful run, confirmed absence timeout or rejected retry handoff/identity can produce failure.",
+        "note": "S3 may be partly updated. An eligible retry creates a new tracking row; terminal rows do not reopen."
+      }
+    ],
+    "edges": [
+      [
+        "queued",
+        "building"
+      ],
+      [
+        "queued",
+        "live"
+      ],
+      [
+        "queued",
+        "failed"
+      ],
+      [
+        "building",
+        "live"
+      ],
+      [
+        "building",
+        "failed"
+      ]
+    ]
+  }
+}

@@ -1,68 +1,109 @@
-# Client delivery and provisioning
+# Bring a client website online
 
-[System overview](../README.md) · [Owner portal](app-raizhost-com.md) · [Deployment flow](deploy-flow.md)
+[System overview](../README.md) · [Owner portal](app-raizhost-com.md) · [Owner publishing](owner-publishing.md) · [Operator reference](#operator-reference)
 
-A client website has two connected pieces: a built static site that visitors receive from
-S3/CloudFront, and an owner content contract that the portal can edit. Hosting provisions
-the destination; the client repository and its workflow determine what is published there.
+A client needs **hosting, a working website, and an owner connection**. The provisioning
+script creates the hosting destination. The site's repository supplies the pages and
+deployment workflow. The portal gives the owner access to edit and publish that site's content.
 
-## Provision the hosting destination
+## From plan to handoff
 
-The operations repository contains the planning command:
+The hosting script covers stages 1–3. Site integration and owner handoff follow in stages
+4–5. Pause at any unmet prerequisite before continuing.
+
+<p align="center">
+  <a href="../diagrams/client-provisioning.svg"><picture>
+    <source media="(max-width: 600px)" srcset="../diagrams/client-provisioning-mobile.svg">
+    <img src="../diagrams/client-provisioning.svg" alt="Five stages: review and authorize the plan; create storage and validate the certificate; connect CloudFront, DNS and monitoring; connect the site repository to the portal; verify the public site and owner handoff. Pause if the certificate is pending." width="100%">
+  </picture></a>
+</p>
+
+### 1. Review the plan — RaizHost operations
+
+Inspect the domain and any existing resources. The provisioning command defaults to a
+read-only plan. Review its proposed changes and obtain authorization for those effects
+before executing them. An `--execute` flag is an execution switch, not an approval record.
+
+### 2. Prepare storage and HTTPS — provisioning script
+
+Create a private, versioned S3 bucket and request an ACM certificate. Add the certificate's
+DNS validation records so AWS can verify control of the domain.
+
+**Certificate pending? Pause here.** If issuance does not finish during the script's wait,
+rerun after the certificate is issued. The script detects resources it has already created.
+
+### 3. Connect delivery and monitoring — provisioning script
+
+Create the CloudFront distribution and its origin access control, then allow that
+distribution to read the private bucket. Add site DNS, health checks and alerts, and record
+the resource map for later operations and Terraform imports.
+
+The standard automated path uses Cloudflare for DNS. Route 53 health checks monitor
+availability. If DNS is skipped or handled manually, complete that work separately;
+conflicting existing records are reported for resolution rather than overwritten.
+
+### 4. Connect the editable site — site repository and portal
+
+The site repository needs three pieces:
+
+- `raizhost/content.json`: the content the pages read when building.
+- `raizhost/content-map.json`: which fields the owner may edit and which remain managed.
+- A build/deploy workflow with AWS permissions scoped to that site's destinations.
+
+Then configure the portal tenant's content source: repository, source credential, live and
+preview branches, workflow filename, content/upload paths, and public/preview URLs.
+
+### 5. Verify the handoff — RaizHost and the owner
+
+Check that the public site loads and that the owner can sign in, save, build a preview and
+follow a publication to its result. Verify the changed page and monitoring delivery/recovery.
+Created resources alone do not establish that the site is ready.
+
+The preview belongs beneath `/_preview/` and carries noindex; the production site is
+indexable where appropriate. **Noindex does not restrict access** to the preview.
+
+## What happens after handoff?
+
+An owner change follows the [Preview/Publish walkthrough](owner-publishing.md). The portal
+commits content to the client repository, whose workflow builds and deploys the site.
+Photo uploads make separate asset commits and can trigger that workflow too. The
+[Showers CI/CD guide](client-site-cicd.md) is a verified example.
+
+Managed layout and code changes follow the site's reviewed code/deploy path.
+
+## Operator reference
+
+<details>
+<summary>Provisioning command, reruns and optional DNS handling</summary>
+
+Run from the operations repository:
 
 ```text
 node infra/new-client-site.mjs --slug <slug> --domain <domain> [--no-www] [--no-dns] [--execute]
 ```
 
-The default run inspects existing state and prints proposed changes. Execution requires
-authorization for the listed effects and an explicit `--execute` run. The flag is not
-evidence of human approval, and an approval hook is not assumed to run in every agent runtime.
+Without `--execute`, this inspects existing state and prints a plan. Review DNS handling
+for the selected options and available credentials; skipped or manual DNS work still needs
+completion before handoff. The script checks existing resources and the expected CloudFront
+routing function before creation. It can be rerun after certificate validation.
 
-<p align="center">
-  <a href="../diagrams/client-provisioning.svg"><img src="../diagrams/client-provisioning.svg" alt="Inspect existing hosting and DNS state, prepare the exact mutation plan, then obtain authorization. An execute run creates a versioned S3 bucket and certificate validation, waits for issuance, creates CloudFront with OAC, adds site DNS and monitoring, and records resource and Terraform import maps." width="100%"></a>
-</p>
+Authorization comes from the approved effects. Do not assume an approval hook ran merely
+because a command accepted its flags.
 
-The script checks for existing resources before creating them, supports rerunning after
-certificate validation, and records the resulting resource map. DNS creation reports
-conflicting existing records rather than replacing them. Its CloudFront Function comparison
-checks the expected routing implementation before creation.
+</details>
 
-The output includes a versioned S3 bucket, an ACM certificate, CloudFront/OAC, DNS records,
-and Route 53/CloudWatch monitoring. Route 53 health checks are monitoring, not the site's
-authoritative DNS. Monitoring configuration still needs delivery and recovery verification.
-
-## Connect the site to the owner portal
-
-1. Build the site in its own repository, with content read from `raizhost/content.json`.
-2. Define the editing boundary in `raizhost/content-map.json`. Keep structural/design fields
-   managed and routine owner fields editable.
-3. Provide the site's build/deploy workflow and scope its OIDC permissions to its resources.
-4. Configure the tenant's content source: repository, credentials/installation, content and
-   upload paths, live branch, preview branch, workflow filename, and public/preview URLs.
-5. Verify authorization, draft saving, preview isolation, publication tracking, and the
-   public result using the site's actual contract.
-
-Preview deployment must stay beneath `/_preview/` and carry noindex. The production website
-is indexable where appropriate. A preview is not access-controlled merely because it is
-noindexed.
-
-## Ongoing changes
-
-Owner publication commits allowed content to the client repository. Photo uploads create
-separate asset commits and can themselves trigger the site's workflow. The
-[owner-to-live guide](owner-publishing.md) traces both paths; the [Showers pipeline](client-site-cicd.md)
-provides a verified example of branch selection, build checks, deployment and confirmation.
-
-Managed structural changes use the site's reviewed code/deploy path. Older operations-hosted
-sites also have a separate update command:
+<details>
+<summary>Update command for older operations-hosted sites</summary>
 
 ```text
 node infra/site-update.mjs <slug> [--execute] [--allow-delete]
 ```
 
-That command owns its build/link checks, asset/HTML cache handling, invalidation, and
-deletion guard. It is not the portal's content-source publisher.
+This command owns its build/link checks, asset/HTML cache handling, invalidation and deletion
+guard. It is a separate path from the portal's connected-site publisher.
+
+</details>
 
 **Source basis:** operations `infra/new-client-site.mjs`, `infra/site-update.mjs`, the client
-launch runbook, and the portal content contract. Current client count and onboarding status
-are outside this document's verification scope.
+launch runbook, and the portal content contract. These describe the inspected implementation;
+this guide does not establish a current client count or onboarding status.

@@ -10,7 +10,10 @@ workflows do not provide that same recovery mechanism.
 ## Portal rollout and rollback
 
 <p align="center">
-  <a href="../diagrams/portal-rollout.svg"><img src="../diagrams/portal-rollout.svg" alt="Portal deployment installs the reviewed script and applies additive migrations before switching the container. An expected running image with healthy container status is recorded as last-good. A start or health failure attempts rollback only when a valid distinct last-good image exists. Recovery checks that prior image's health and retains additive migrations. Whether rollback succeeds or not, the rejected candidate's release fails." width="100%"></a>
+  <a href="../diagrams/portal-rollout.svg"><picture>
+    <source media="(max-width: 600px)" srcset="../diagrams/portal-rollout-mobile.svg">
+    <img src="../diagrams/portal-rollout.svg" alt="Portal deployment installs the reviewed script and applies additive migrations before switching the container. An expected running image with healthy container status is recorded as last-good. A start or health failure attempts rollback only when a valid distinct last-good image exists. Recovery checks that prior image's health and retains additive migrations. Whether rollback succeeds or not, the rejected candidate's release fails." width="100%">
+  </picture></a>
 </p>
 
 1. Deploy selects the exact successful CI head SHA. SSM installs and verifies that revision's

@@ -20,12 +20,15 @@ successful workflow's guarantee is limited by that client's post-deploy checks.
 | Status temporarily unavailable | The latest observation cannot be trusted or obtained | Neither success nor failure; retain the last confirmed state |
 
 <p align="center">
-  <a href="../diagrams/publish-status.svg"><img src="../diagrams/publish-status.svg" alt="A recorded publication begins queued. A matching in-progress run advances it to building; matching success advances either pending state to live, and a confirmed unsuccessful result or absence timeout advances it to failed. Live and failed are terminal records. Unavailable lookups do not create a failure transition. Preview-kind live means preview ready." width="100%"></a>
+  <a href="../diagrams/publish-status.svg"><picture>
+    <source media="(max-width: 600px)" srcset="../diagrams/publish-status-mobile.svg">
+    <img src="../diagrams/publish-status.svg" alt="A recorded publication begins queued. A matching in-progress run advances it to building; matching success advances either pending state to live, and a confirmed unsuccessful result or absence timeout advances it to failed. Live and failed are terminal records. Unavailable lookups do not create a failure transition. Preview-kind live means preview ready." width="100%">
+  </picture></a>
 </p>
 
 The portal can observe a completed run before it ever sees `building`. Status updates are
 monotonic; delayed responses cannot turn a terminal record back into a pending one. A
-permitted workflow retry creates a new tracking row. [Open the state diagram](../diagrams/publish-status.svg).
+permitted workflow retry creates a new tracking row. [Open the status guide diagram](../diagrams/publish-status.svg).
 
 ## How is a run matched?
 
