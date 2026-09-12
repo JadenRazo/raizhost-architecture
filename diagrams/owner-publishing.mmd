@@ -1,22 +1,32 @@
-flowchart TB
-  owner["Owner signs in"] --> portal["Portal on anchor<br/>Authorize tenant and fields"]
-  source["Client repository<br/>content-map.json + content.json"] -->|"read at one source revision"| portal
-  portal -->|"Save: expected revision must match"| draft[("Postgres draft<br/>Persistent revision token")]
-  draft --> action{"Owner action"}
+sequenceDiagram
+  participant Owner as Owner browser
+  participant Portal as Portal + Postgres
+  participant GitHub as Client Git repository
+  participant CI as Client workflow
+  participant Site as S3 + CloudFront
 
-  action -->|"Preview"| preview["Commit content + images<br/>Preview branch"]
-  preview --> previewBuild["Client workflow builds preview"]
-  previewBuild --> previewS3["S3 /_preview/ only<br/>Noindex; public root unchanged"]
-
-  action -->|"Publish"| commit["Check live source head<br/>Commit content + images to live branch"]
-  commit --> build["Client workflow builds site"]
-  build --> s3["Upload public S3 output<br/>Invalidate CloudFront"]
-  s3 --> result{"Exact commit's workflow result"}
-  result -->|"success"| live["Portal confirms update live"]
-  result -->|"failed"| failed["Report failure<br/>Public objects may be partly updated"]
-  result -->|"lookup unavailable / still running"| pending["Retain last confirmed status<br/>Bounded reconciliation"]
-
-  classDef data fill:#ecfdf5,stroke:#047857,color:#172b35
-  classDef choice fill:#fff7ed,stroke:#c2410c,color:#172b35
-  class source,draft,previewS3,s3,live data
-  class action,result choice
+  Note over Owner,Portal: Owner confirms Preview or Publish
+  Owner->>Portal: Flush latest draft if needed
+  Portal-->>Owner: Accepted draft revision + source head
+  Owner->>Portal: POST content/publish<br/>kind + expected revision + source head
+  Portal->>Portal: Session, tenant, write access<br/>Validate fields and source snapshot
+  opt Preview only
+    Portal->>GitHub: Reset preview branch to validated live head
+  end
+  Portal->>GitHub: Commit content.json to selected branch<br/>Reject a changed branch head
+  GitHub->>GitHub: Credential and branch policy must allow write
+  GitHub-->>Portal: Content commit SHA
+  par Client release from branch push
+    GitHub-->>CI: Push event at content SHA<br/>main or preview
+    CI->>CI: Checks, target selection, site build<br/>Assume AWS role using OIDC
+    CI->>Site: S3 upload<br/>CDN invalidation, HTTP smoke
+  and Portal submission confirmation
+    Portal->>Portal: Record queued publish ID + SHA + kind<br/>Clear or retain draft and advance revision
+    Portal-->>Owner: HTTP 202: submission recorded
+  end
+  Note over CI,Site: Client workflow owns the deployment result
+  Owner->>Portal: GET publication status while pending
+  Portal->>GitHub: Look up exact SHA + branch + workflow<br/>or recorded run identity
+  GitHub-->>Portal: Matching run state, absence, or unavailable
+  Portal->>Portal: Persist confirmed progression only
+  Portal-->>Owner: Queued / building / preview ready / live / failed<br/>Unconfirmed lookup retains last known state

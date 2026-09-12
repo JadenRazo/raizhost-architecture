@@ -36,10 +36,10 @@ NODES = [
     ("tracker_db", 812, 654, 280, 80, "data", ["PgBouncer → Postgres", "Tracker database on anchor"]),
     ("bundles", 304, 792, 188, 80, "data", ["Private S3 assets", "/_next/static/*"]),
     ("pollers", 812, 792, 280, 80, "runtime", ["Scheduled poller Lambdas", "EventBridge invokes three tiers", "Fetch sources; normalize records"]),
-    ("publish", 28, 1004, 236, 90, "source", ["Owner presses Publish", "Portal validates content"]),
-    ("repo", 304, 1004, 188, 90, "source", ["Client repository", "Content + image commit"]),
-    ("build", 532, 1004, 240, 90, "runtime", ["Client site workflow", "Build + upload + invalidate"]),
-    ("output", 812, 1004, 280, 90, "data", ["S3 site output", "CloudFront serves visitors"]),
+    ("publish", 28, 1004, 236, 90, "source", ["Preview or Publish", "Save + authorize + validate"]),
+    ("repo", 304, 1004, 188, 90, "source", ["Client repository", "Content JSON commit", "Selected branch push"]),
+    ("build", 532, 1004, 240, 90, "runtime", ["Client site workflow", "Checks + build + AWS writes"]),
+    ("output", 812, 1004, 280, 90, "data", ["S3 + CloudFront", "Preview prefix or public site"]),
 ]
 # source, destination, async, SVG path, optional text and its coordinates.
 EDGES = []
@@ -79,7 +79,7 @@ def render_svg():
     text(48, 155, "CloudFront boxes below are separate distributions. Origin arrows apply on a cache miss or revalidation.")
     for y, label in [(218, "01  Read a website"), (358, "02  Submit or manage an inquiry"),
                      (498, "03  Use the owner portal"), (638, "04  Read LLM updates"),
-                     (988, "05  Publish an owner's content update")]:
+                     (988, "05  Build a preview or publish an owner's update")]:
         text(28, y, label, 'class="bandt"')
     for ident, x, y, w, h, kind, lines in NODES:
         fill, stroke = COLORS[kind]
@@ -103,7 +103,7 @@ def render_svg():
     text(76, 1140, "Request / data access", 'class="lbl"')
     parts.append('<path class="ld" d="M264 1136 L300 1136"/>')
     text(312, 1140, "Scheduled work / publication", 'class="lbl"')
-    text(28, 1170, "RaizHost architecture · source and evidence scope: docs/current-state.md", 'font-size="12"')
+    text(28, 1170, "Publication status: portal polls the exact client workflow run. Full path: docs/owner-publishing.md", 'font-size="12"')
     parts.append('</svg>\n')
     return '\n'.join(parts)
 

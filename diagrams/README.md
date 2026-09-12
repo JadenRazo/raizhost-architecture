@@ -11,7 +11,10 @@ at full size, so its detail remains available when GitHub scales it down on a ph
 | Request routing | [request-flow.mmd](request-flow.mmd) | DNS versus HTTPS, origins, and direct browser APIs |
 | Code deployment | [deploy-flow.mmd](deploy-flow.mmd) | The distinct release trigger and artifact path for each repository |
 | Client delivery | [client-provisioning.mmd](client-provisioning.mmd) | Hosting authorization, resource creation, and site integration |
-| Owner publication | [owner-publishing.mmd](owner-publishing.mmd) | Draft, preview, live publication, and confirmation |
+| Owner publication | [owner-publishing.mmd](owner-publishing.mmd) | Button, save flush, server gates, Git commit, asynchronous client build and status return |
+| Preview versus live | [preview-and-live.mmd](preview-and-live.mmd) | Separate content commits and rebuilds; preview prefix versus public root |
+| Client website CI/CD | [client-site-cicd.mmd](client-site-cicd.mmd) | Showers' actual tests, target selection, build, OIDC, S3 passes and smoke check |
+| Publication status | [publish-status.mmd](publish-status.mmd) | Confirmed queued/building/live/failed states and uncertainty boundaries |
 | Tracker data | [llm-data-flow.mmd](llm-data-flow.mmd) | Scheduled collection versus reader requests |
 | CI/CD | [ci-cd-flow.mmd](ci-cd-flow.mmd) | PR checks, manual/automatic release gates, and exact revision selection |
 | Deployment identity | [deployment-identity.mmd](deployment-identity.mmd) | Runner role, GitHub OIDC, AWS trust, and per-operation permission |

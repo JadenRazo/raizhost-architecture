@@ -1,6 +1,10 @@
-# From a code change to a release
+# From an application code change to a release
 
-[System overview](../README.md) · [Deployment identity](authorization.md) · [Artifacts and destinations](deploy-flow.md) · [Release verification](release-verification.md)
+[System overview](../README.md) · [Client content CI/CD](client-site-cicd.md) · [Deployment identity](authorization.md) · [Release verification](release-verification.md)
+
+**An owner pressing Preview or Publish follows the [client website pipeline](client-site-cicd.md).**
+The [owner walkthrough](owner-publishing.md) explains how that push is created. This page
+covers changes to the marketing, portal and tracker applications themselves.
 
 CI checks proposed code. CD releases a selected revision. RaizHost's three main applications
 connect those stages differently: marketing requires a manual production dispatch, the
@@ -75,8 +79,9 @@ The [identity diagram](authorization.md#deployment-identity) shows how a job obt
 to write. The [verification guide](release-verification.md) explains which checks run after
 those writes and how a failed rollout is handled.
 
-Client content follows the [owner publication flow](app-raizhost-com.md): the client repository
-owns its build and live/preview deployment checks. Do not infer those checks from portal CI.
+Client content follows the [owner publication flow](owner-publishing.md), then
+[client CI/CD](client-site-cicd.md): the client repository owns its build and live/preview
+deployment checks. Do not infer those checks from portal CI.
 Quote/CRM functions have separate deployment commands. Infrastructure CI performs static
 validation without AWS identity; live Terraform plan/apply remains held pending drift
 reconciliation. Passing this architecture repository's documentation CI only validates docs.

@@ -37,7 +37,8 @@ authoritative DNS. Monitoring configuration still needs delivery and recovery ve
 2. Define the editing boundary in `raizhost/content-map.json`. Keep structural/design fields
    managed and routine owner fields editable.
 3. Provide the site's build/deploy workflow and scope its OIDC permissions to its resources.
-4. Configure the tenant's source repository, live branch, and optional preview branch/URL.
+4. Configure the tenant's content source: repository, credentials/installation, content and
+   upload paths, live branch, preview branch, workflow filename, and public/preview URLs.
 5. Verify authorization, draft saving, preview isolation, publication tracking, and the
    public result using the site's actual contract.
 
@@ -47,9 +48,10 @@ noindexed.
 
 ## Ongoing changes
 
-Owner publication commits allowed content and uploaded images to the client repository.
-The site's workflow builds and deploys them. The [portal guide](app-raizhost-com.md) explains
-draft revisions, source conflicts, and when a publication may be called live.
+Owner publication commits allowed content to the client repository. Photo uploads create
+separate asset commits and can themselves trigger the site's workflow. The
+[owner-to-live guide](owner-publishing.md) traces both paths; the [Showers pipeline](client-site-cicd.md)
+provides a verified example of branch selection, build checks, deployment and confirmation.
 
 Managed structural changes use the site's reviewed code/deploy path. Older operations-hosted
 sites also have a separate update command:

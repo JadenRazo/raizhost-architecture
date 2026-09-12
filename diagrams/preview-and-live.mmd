@@ -1,0 +1,17 @@
+flowchart TB
+  draft["Owner confirms an action<br/>Flush latest draft; validate source + revision"]
+  draft --> preview["PREVIEW<br/>Reset preview branch to validated live head"]
+  draft --> live["PUBLISH<br/>Use current validated live head"]
+  preview --> pc["New content.json commit<br/>preview branch"]
+  live --> lc["New content.json commit<br/>main branch"]
+  pc --> pb["Client workflow builds again<br/>PREVIEW=1; base /_preview/"]
+  lc --> lb["Client workflow builds again<br/>PREVIEW=0; base /"]
+  pb --> ps["S3 _preview/ prefix<br/>Invalidate /_preview/*"]
+  lb --> ls["S3 public root<br/>Invalidate /*"]
+  ps --> pr["Review URL<br/>Noindex; anonymous access observed"]
+  ls --> lr["Public website URL<br/>Verify the changed content"]
+
+  classDef action fill:#fff7ed,stroke:#c2410c,color:#172b35
+  classDef output fill:#ecfdf5,stroke:#047857,color:#172b35
+  class preview,live action
+  class ps,ls,pr,lr output
