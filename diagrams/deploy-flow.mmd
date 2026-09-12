@@ -11,7 +11,7 @@ flowchart TB
   pjob --> ssm["SSM on anchor<br/>Reviewed script + additive migrations"]
   ssm --> health{"Container health"}
   health -->|"pass"| live["Record successful image"]
-  health -->|"fail"| rollback["Restore prior image<br/>Verify rollback health"]
+  health -->|"fail"| rollback["Try eligible last-good image<br/>Verify recovery; release stays failed"]
 
   tracker --> tjob["GitHub Actions + scoped OIDC<br/>Build web image + poller ZIP"]
   tjob --> web["Upload S3 bundles first<br/>Update web Lambda"]

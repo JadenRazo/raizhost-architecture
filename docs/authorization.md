@@ -32,7 +32,10 @@ bypass permission.
 ## Deployment identity
 
 <p align="center">
-  <a href="../diagrams/deployment-identity.svg"><img src="../diagrams/deployment-identity.svg" alt="A release job runs on its selected runner. The portal CodeBuild service role provides GitHub connection access and logging, separately from deployment permission. A job with id-token write requests a GitHub OIDC token. AWS STS checks token trust before issuing temporary deploy-role credentials. IAM evaluates each action and resource; a denied later operation does not undo earlier writes. Permitted writes still need application release verification." width="100%"></a>
+  <a href="../diagrams/deployment-identity.svg"><picture>
+    <source media="(max-width: 600px)" srcset="../diagrams/deployment-identity-mobile.svg">
+    <img src="../diagrams/deployment-identity.svg" alt="A release job runs on its selected runner. The portal CodeBuild service role provides GitHub connection access and logging, separately from deployment permission. A job with id-token write requests a GitHub OIDC token. AWS STS checks token trust before issuing temporary deploy-role credentials. IAM evaluates each action and resource; a denied later operation does not undo earlier writes. Permitted writes still need application release verification." width="100%">
+  </picture></a>
 </p>
 
 1. The job must satisfy its repository's [event and revision conditions](ci-cd.md#3-select-the-release-and-its-exact-revision).
@@ -67,7 +70,10 @@ This flow covers connected-site **Save, Preview and Publish** requests. The API 
 enforce it even when a caller bypasses the editor interface.
 
 <p align="center">
-  <a href="../diagrams/portal-authorization.svg"><img src="../diagrams/portal-authorization.svg" alt="A portal content write needs a valid Better Auth session, an accessible tenant with a content source, and a platform admin or tenant editor/owner role. Non-admin writes are billing-gated when billing is enabled. Action-specific checks enforce content permissions and expected draft/source revisions. Accepted saves write Postgres; accepted preview or live publication commits to an explicit branch and is confirmed through that client's workflow." width="100%"></a>
+  <a href="../diagrams/portal-authorization.svg"><picture>
+    <source media="(max-width: 600px)" srcset="../diagrams/portal-authorization-mobile.svg">
+    <img src="../diagrams/portal-authorization.svg" alt="A portal content write needs a valid Better Auth session, an accessible tenant with a content source, and a platform admin or tenant editor/owner role. Non-admin writes are billing-gated when billing is enabled. Action-specific checks enforce content permissions and expected draft/source revisions. Accepted saves write Postgres; accepted preview or live publication commits to an explicit branch and is confirmed through that client's workflow." width="100%">
+  </picture></a>
 </p>
 
 | Check | Server behavior |

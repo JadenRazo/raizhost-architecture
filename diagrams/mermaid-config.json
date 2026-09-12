@@ -2,6 +2,7 @@
   "theme": "base",
   "deterministicIds": true,
   "deterministicIDSeed": "raizhost-architecture",
+  "themeCSS": ".edgeLabel rect { opacity: 1 !important; fill: #ffffff !important; }",
   "themeVariables": {
     "fontFamily": "Arial, Helvetica, sans-serif",
     "fontSize": "16px",

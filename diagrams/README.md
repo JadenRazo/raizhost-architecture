@@ -1,7 +1,8 @@
 # Diagram workflow
 
-Public documents embed committed SVGs with text alternatives. Each diagram is also linked
-at full size, so its detail remains available when GitHub scales it down on a phone.
+Public documents embed committed SVGs with text alternatives. Journey diagrams have desktop
+and narrow-screen layouts selected by a GitHub-compatible `picture` element. Each guide also
+links to the full-size diagram and explains the same stages in prose.
 
 ## Choose the source
 
@@ -10,21 +11,37 @@ at full size, so its detail remains available when GitHub scales it down on a ph
 | System overview | [overview.py](overview.py) | Serving lanes, data boundaries, and owner publication |
 | Request routing | [request-flow.mmd](request-flow.mmd) | DNS versus HTTPS, origins, and direct browser APIs |
 | Code deployment | [deploy-flow.mmd](deploy-flow.mmd) | The distinct release trigger and artifact path for each repository |
-| Client delivery | [client-provisioning.mmd](client-provisioning.mmd) | Hosting authorization, resource creation, and site integration |
-| Owner publication | [owner-publishing.mmd](owner-publishing.mmd) | Button, save flush, server gates, Git commit, asynchronous client build and status return |
+| Client delivery | [journeys.json](journeys.json) (`client-provisioning`) | Hosting authorization, resource creation, and site integration |
+| Owner publication | [journeys.json](journeys.json) (`owner-publishing`) | Button, save flush, server gates, Git commit, asynchronous client build and status return |
 | Preview versus live | [preview-and-live.mmd](preview-and-live.mmd) | Separate content commits and rebuilds; preview prefix versus public root |
 | Client website CI/CD | [client-site-cicd.mmd](client-site-cicd.mmd) | Showers' actual tests, target selection, build, OIDC, S3 passes and smoke check |
-| Publication status | [publish-status.mmd](publish-status.mmd) | Confirmed queued/building/live/failed states and uncertainty boundaries |
+| Publication status | [journeys.json](journeys.json) (`publish-status`) | Confirmed queued/building/live/failed states and uncertainty boundaries |
 | Tracker data | [llm-data-flow.mmd](llm-data-flow.mmd) | Scheduled collection versus reader requests |
 | CI/CD | [ci-cd-flow.mmd](ci-cd-flow.mmd) | PR checks, manual/automatic release gates, and exact revision selection |
-| Deployment identity | [deployment-identity.mmd](deployment-identity.mmd) | Runner role, GitHub OIDC, AWS trust, and per-operation permission |
-| Portal authorization | [portal-authorization.mmd](portal-authorization.mmd) | Session, tenant, role, billing, and content mutation gates |
-| Portal rollout | [portal-rollout.mmd](portal-rollout.mmd) | Preparation, candidate health, eligible rollback, and recovery confirmation |
+| Deployment identity | [journeys.json](journeys.json) (`deployment-identity`) | Runner role, GitHub OIDC, AWS trust, and per-operation permission |
+| Portal authorization | [journeys.json](journeys.json) (`portal-authorization`) | Session, tenant, role, billing, and content mutation gates |
+| Portal rollout | [journeys.json](journeys.json) (`portal-rollout`) | Preparation, candidate health, eligible rollback, and recovery confirmation |
 
 The overview generator produces **both** `architecture.svg` and `architecture.mmd` from
 one set of nodes and edges. Its explicit layout keeps the main map readable while the
 Mermaid sketch remains useful for inspecting topology. Do not edit either generated output
 by hand. `fonts.css` preserves the Inter subsets already embedded in the original diagram.
+
+## Keep the reading path clear
+
+The six journey diagrams use [journeys.py](journeys.py) to render `journeys.json` into an
+SVG, a narrow `-mobile.svg` variant and a Mermaid sketch. Edit the JSON's actors, headings
+and descriptions; do not hand-edit generated outputs. Both SVG sizes contain the same facts.
+Stage headings and guide headings should describe the same handoffs in the same order.
+
+The SVG layout reserves the gaps between stages for short connectors. It measures wrapping
+with the embedded font, keeps explanations inside their stage, and places concurrent work
+or alternative outcomes together with an explicit label. Status cards are a reference,
+not a sequence: their text lists possible next states; the Mermaid sketch preserves edges.
+
+Keep the diagram to the main path and consequential stop conditions. Put commands, retries
+and implementation detail in the guide, using expandable reference sections where useful.
+A source-valid diagram can still be unreadable. Inspect the actual document image sizes.
 
 ## Render and check
 
@@ -48,6 +65,8 @@ Run the lightweight checks without rerendering:
 
 ```bash
 python3 diagrams/overview.py --check
+python3 diagrams/journeys.py --check
+python3 diagrams/journeys.py --self-test
 python3 diagrams/check_docs.py
 python3 diagrams/check.py
 ```
@@ -55,12 +74,15 @@ python3 diagrams/check.py
 CI additionally lints Markdown, discovers and renders **every** Mermaid file to validate syntax, and
 checks public documentation for private identifiers. The checks cover:
 
-- Overview source/output agreement.
-- Every Mermaid source and SVG in the render manifest.
-- Local documentation links, SVG embeds, and image text alternatives.
+- Overview and journey source/output agreement, including narrow variants.
+- Every Mermaid source and desktop/narrow SVG in the render manifest.
+- Local documentation links, SVG embeds, responsive sources and image text alternatives.
 - Portable SVG structure, responsive viewBox, and opaque background.
-- Overview labels fitting their boxes, label collisions, and lines crossing text, measured
-  with the actual embedded font metrics.
+- Overview and journey text bounds, label collisions and connectors crossing text, measured
+  with embedded font metrics. Injected crossings, overflow and overlapping labels must fail.
+- Other Mermaid diagrams receive syntax/asset checks; they still require visual inspection
+  for connector placement and readability. Their edge labels require opaque white
+  backgrounds so connectors cannot show through the words.
 
 These checks cannot establish that an arrow matches production. Review diagram semantics
 against the owning application source and dated deployment/live evidence. Inspect generated

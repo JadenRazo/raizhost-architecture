@@ -41,12 +41,14 @@ jobs:
       - name: Check overview SVG and sketch match their shared graph
         run: python3 diagrams/overview.py --check
 
-      - name: Check mobile-safe embeds and render freshness
+      - name: Check responsive embeds and render manifest
         run: python3 diagrams/check_docs.py
 
       - name: Diagram geometry check (text fits boxes, no line crosses text)
         run: |
           pip install --quiet fonttools brotli
+          python3 diagrams/journeys.py --check
+          python3 diagrams/journeys.py --self-test
           python3 diagrams/check.py
           if python3 diagrams/check.py ../../etc/passwd; then
             echo "::error::Geometry checker accepted a file-path override"

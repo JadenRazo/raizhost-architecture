@@ -1,8 +1,9 @@
-"""Validate mobile-safe diagram embeds and their source/output manifest."""
+"""Validate diagram sources, responsive embeds, local links and rendered assets."""
 
 from __future__ import annotations
 
 import hashlib
+import json
 import pathlib
 import re
 import sys
@@ -10,26 +11,24 @@ from urllib.parse import unquote, urlsplit
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+DIAGRAMS = ROOT / "diagrams"
 PAIRS = {path.name: path.with_suffix(".svg").name
-         for path in sorted((ROOT / "diagrams").glob("*.mmd"))}
-MANIFEST = ROOT / "diagrams" / "rendered.sha256"
-
-
-def digest(path: pathlib.Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
+         for path in sorted(DIAGRAMS.glob("*.mmd"))}
+JOURNEYS = json.loads((DIAGRAMS / "journeys.json").read_text())
+MOBILE = {f"{name}-mobile.svg" for name in JOURNEYS}
+OUTPUTS = set(PAIRS.values()) | MOBILE
+MANIFEST = DIAGRAMS / "rendered.sha256"
 issues: list[str] = []
-markdown_paths = sorted(path for path in ROOT.rglob("*.md")
-                        if not any(part in {".git", "node_modules"} for part in path.parts))
-for path in markdown_paths:
-    text = path.read_text(encoding="utf-8")
+
+markdown = {path: path.read_text(encoding="utf-8") for path in sorted(ROOT.rglob("*.md"))
+            if not any(part in {".git", "node_modules"} for part in path.parts)}
+for path, text in markdown.items():
     if re.search(r"^```mermaid\s*$", text, flags=re.MULTILINE):
-        issues.append(f"{path.relative_to(ROOT)}: inline Mermaid is not mobile-safe; embed an SVG")
-    # Catch broken local navigation as well as missing diagram files. External
-    # source links are checked independently against the inspected repositories.
+        issues.append(f"{path.relative_to(ROOT)}: embed a rendered SVG instead of inline Mermaid")
     links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
     links += re.findall(r'(?:src|href)="([^"]+)"', text)
+    for srcset in re.findall(r'srcset="([^"]+)"', text):
+        links += [candidate.strip().split()[0] for candidate in srcset.split(",")]
     for link in links:
         parsed = urlsplit(link.strip("<>"))
         if parsed.scheme or parsed.netloc or not parsed.path:
@@ -45,55 +44,63 @@ if not MANIFEST.exists():
     issues.append("diagrams/rendered.sha256 is missing")
 else:
     for line in MANIFEST.read_text(encoding="utf-8").splitlines():
-        if not line.strip():
-            continue
         match = re.fullmatch(r"([0-9a-f]{64})  (diagrams/[a-z0-9-]+\.(?:mmd|svg))", line)
         if not match:
             issues.append(f"invalid manifest line: {line!r}")
-            continue
-        manifest[match.group(2)] = match.group(1)
+        elif match[2] in manifest:
+            issues.append(f"duplicate manifest entry: {match[2]}")
+        else:
+            manifest[match[2]] = match[1]
 
-for source_name, output_name in PAIRS.items():
-    for name in (source_name, output_name):
-        path = ROOT / "diagrams" / name
-        key = f"diagrams/{name}"
-        if not path.exists():
-            issues.append(f"{key} is missing")
-            continue
-        expected = manifest.get(key)
-        if expected is None:
-            issues.append(f"{key} is missing from the render manifest")
-        elif digest(path) != expected:
-            issues.append(f"{key} changed without refreshing diagrams/rendered.sha256")
+expected_paths = {f"diagrams/{name}" for name in set(PAIRS) | OUTPUTS}
+actual_paths = {f"diagrams/{p.name}" for p in DIAGRAMS.iterdir() if p.suffix in {".mmd", ".svg"}}
+for unexpected in (actual_paths | set(manifest)) - expected_paths:
+    issues.append(f"unexpected source/output: {unexpected}")
+for key in sorted(expected_paths):
+    path = ROOT / key
+    if not path.exists():
+        issues.append(f"{key} is missing")
+    elif key not in manifest:
+        issues.append(f"{key} is missing from the render manifest")
+    elif hashlib.sha256(path.read_bytes()).hexdigest() != manifest[key]:
+        issues.append(f"{key} changed without refreshing diagrams/rendered.sha256")
 
-    svg_path = ROOT / "diagrams" / output_name
-    if svg_path.exists():
-        svg = svg_path.read_text(encoding="utf-8")
-        if "<svg" not in svg or "viewBox=" not in svg:
-            issues.append(f"diagrams/{output_name}: responsive SVG viewBox is missing")
-        if "<title" not in svg or "<desc" not in svg:
-            issues.append(f"diagrams/{output_name}: accessible title/description is missing")
-        if '<rect width="100%" height="100%" fill="#ffffff"/>' not in svg:
-            issues.append(f"diagrams/{output_name}: opaque mobile/dark-mode canvas is missing")
-        if "@import url(" in svg:
-            issues.append(f"diagrams/{output_name}: external stylesheet import is not portable")
+for name in sorted(OUTPUTS):
+    path = DIAGRAMS / name
+    if not path.exists():
+        continue
+    svg = path.read_text(encoding="utf-8")
+    if "<svg" not in svg or "viewBox=" not in svg:
+        issues.append(f"{name}: responsive SVG viewBox is missing")
+    if "<title" not in svg or "<desc" not in svg:
+        issues.append(f"{name}: accessible title/description is missing")
+    if '<rect width="100%" height="100%" fill="#ffffff"/>' not in svg:
+        issues.append(f"{name}: opaque light/dark-mode canvas is missing")
+    if "@import url(" in svg:
+        issues.append(f"{name}: external stylesheet import is not portable")
+    if 'class="edgeLabel"' in svg and not re.search(
+        r"\.edgeLabel rect\s*\{\s*opacity:\s*1\s*!important;\s*fill:\s*(?:#ffffff|rgb\(255,\s*255,\s*255\))\s*!important;?\s*\}", svg
+    ):
+        issues.append(f"{name}: connector labels need an opaque white background")
 
-for output_name in PAIRS.values():
-    tags: list[tuple[pathlib.Path, str]] = []
-    for path in markdown_paths:
-        text = path.read_text(encoding="utf-8")
+for name in PAIRS.values():
+    found = False
+    for path, text in markdown.items():
         for tag in re.findall(r"<img\b[^>]*>", text, flags=re.IGNORECASE):
-            if output_name in tag:
-                tags.append((path, tag))
-    if not tags:
-        issues.append(f"diagrams/{output_name}: rendered asset is not embedded anywhere")
-    for path, tag in tags:
-        if not re.search(r'alt="[^\"]+"', tag):
-            issues.append(f"{path.relative_to(ROOT)}: {output_name} needs descriptive alt text")
-        if 'width="100%"' not in tag:
-            issues.append(
-                f"{path.relative_to(ROOT)}: {output_name} embed must use width=\"100%\""
-            )
+            src = re.search(r'src="([^"]+)"', tag)
+            if not src or pathlib.PurePosixPath(src[1]).name != name:
+                continue
+            found = True
+            if not re.search(r'alt="[^\"]+"', tag) or 'width="100%"' not in tag:
+                issues.append(f"{path.relative_to(ROOT)}: {name} needs alt text and width=\"100%\"")
+            if pathlib.Path(name).stem in JOURNEYS:
+                pictures = re.findall(r"<picture\b[^>]*>.*?</picture>", text, re.DOTALL)
+                mobile_name = pathlib.Path(name).stem + "-mobile.svg"
+                if not any(tag in picture and f'/{mobile_name}"' in picture
+                           and 'media="(max-width: 600px)"' in picture for picture in pictures):
+                    issues.append(f"{path.relative_to(ROOT)}: {name} needs its narrow-screen picture source")
+    if not found:
+        issues.append(f"{name}: rendered asset is not embedded anywhere")
 
 if issues:
     print("diagram documentation check failed:")
@@ -101,4 +108,4 @@ if issues:
         print(f"- {issue}")
     sys.exit(1)
 
-print(f"diagram documentation check passed ({len(PAIRS)} mobile-safe SVGs)")
+print(f"Documentation check passed: {len(PAIRS)} diagrams, {len(MOBILE)} narrow variants, links and manifest")
