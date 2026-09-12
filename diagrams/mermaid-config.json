@@ -1,18 +1,21 @@
 {
   "theme": "base",
+  "deterministicIds": true,
+  "deterministicIDSeed": "raizhost-architecture",
   "themeVariables": {
-    "fontFamily": "Inter, Segoe UI, Helvetica, Arial, sans-serif",
-    "fontSize": "15px",
-    "primaryColor": "#eef2ff",
-    "primaryBorderColor": "#4f46e5",
-    "primaryTextColor": "#111827",
+    "fontFamily": "Arial, Helvetica, sans-serif",
+    "fontSize": "16px",
+    "primaryColor": "#eff6ff",
+    "primaryBorderColor": "#2563eb",
+    "primaryTextColor": "#172b35",
     "lineColor": "#64748b",
     "clusterBkg": "#f8fafc",
     "clusterBorder": "#cbd5e1",
     "edgeLabelBackground": "#ffffff"
   },
   "flowchart": {
-    "curve": "basis",
+    "htmlLabels": false,
+    "curve": "linear",
     "nodeSpacing": 30,
     "rankSpacing": 44,
     "useMaxWidth": true

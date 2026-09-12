@@ -112,11 +112,11 @@ def rotate_bbox(box, transform):
 
 
 classes = {
-    "bandt": (13, 600, 0.4, True),
-    "h": (14, 600, 0, False),
-    "s": (12, 400, 0, False),
-    "m": (11, 400, 0, False),
-    "lbl": (11, 400, 0, False),
+    "bandt": (14, 600, 0.4, True),
+    "h": (16, 600, 0, False),
+    "s": (14, 400, 0, False),
+    "m": (12, 400, 0, False),
+    "lbl": (12, 400, 0, False),
 }
 texts = []
 parse_errors = []
@@ -168,9 +168,6 @@ for match in re.finditer(
 ):
     x, y, box_width, box_height = map(float, match.groups())
     rects.append((x, y, x + box_width, y + box_height))
-# Cylinder + pill approximations.
-rects.append((252, 580, 372, 670))
-rects.append((120, 24, 380, 64))
 
 PAD = 8
 issues = list(parse_errors)

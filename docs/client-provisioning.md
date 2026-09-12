@@ -1,48 +1,66 @@
-# Client provisioning
+# Client delivery and provisioning
 
-Going live for a new client used to be ~12 console steps. It is now one command that plans by
-default and mutates only on `--execute`, which trips the operations guard's approval prompt.
+[System overview](../README.md) · [Owner portal](app-raizhost-com.md) · [Deployment flow](deploy-flow.md)
+
+A client website has two connected pieces: a built static site that visitors receive from
+S3/CloudFront, and an owner content contract that the portal can edit. Hosting provisions
+the destination; the client repository and its workflow determine what is published there.
+
+## Provision the hosting destination
+
+The operations repository contains the planning command:
 
 ```text
 node infra/new-client-site.mjs --slug <slug> --domain <domain> [--no-www] [--no-dns] [--execute]
 ```
 
+The default run inspects existing state and prints proposed changes. Execution requires
+authorization for the listed effects and an explicit `--execute` run. The flag is not
+evidence of human approval, and an approval hook is not assumed to run in every agent runtime.
+
 <p align="center">
-  <img src="../diagrams/client-provisioning.svg" alt="Client provisioning starts in read-only plan mode, prints an exact mutation manifest, and changes nothing unless the operator reruns with execute and approves the guard. It creates a versioned S3 bucket and DNS-validated certificate, stops cleanly for certificate issuance, then creates CloudFront, create-only Cloudflare records, a health check and alarm, and finally a client registry plus Terraform import map." width="100%">
+  <a href="../diagrams/client-provisioning.svg"><img src="../diagrams/client-provisioning.svg" alt="Inspect existing hosting and DNS state, prepare the exact mutation plan, then obtain authorization. An execute run creates a versioned S3 bucket and certificate validation, waits for issuance, creates CloudFront with OAC, adds site DNS and monitoring, and records resource and Terraform import maps." width="100%"></a>
 </p>
 
-<sub>Editable source: [`diagrams/client-provisioning.mmd`](../diagrams/client-provisioning.mmd). A committed SVG is embedded so the flow remains visible in GitHub's mobile clients.</sub>
+The script checks for existing resources before creating them, supports rerunning after
+certificate validation, and records the resulting resource map. DNS creation reports
+conflicting existing records rather than replacing them. Its CloudFront Function comparison
+checks the expected routing implementation before creation.
 
-## Properties that matter
+The output includes a versioned S3 bucket, an ACM certificate, CloudFront/OAC, DNS records,
+and Route 53/CloudWatch monitoring. Route 53 health checks are monitoring, not the site's
+authoritative DNS. Monitoring configuration still needs delivery and recovery verification.
 
-- **Idempotent.** Live AWS is the state; every step is check-then-create and safe to re-run.
-  Existing resources are reported, not touched.
-- **Re-entrant across the certificate wait.** The same command twice is the normal path.
-- **DNS is create-only.** An existing record with different content is reported and left
-  alone — so an MX record can never be clobbered by a site launch.
-- **Drift alarm.** The checked-in CloudFront Function source is byte-compared against the live
-  reference function on every run; divergence aborts before anything is created.
-- **Registry out, not just resources.** Each client gets a JSON registry of every ID plus a
-  `terraformImport` map, so adoption into Terraform is a mechanical import loop later.
-- **Monitoring is part of go-live**, not a follow-up: health check + alarm are created in the
-  same run. (The first alarm evaluation fires one ALARM→OK pair before real data arrives — that
-  pair is the delivery test.)
+## Connect the site to the owner portal
 
-## After launch: content updates
+1. Build the site in its own repository, with content read from `raizhost/content.json`.
+2. Define the editing boundary in `raizhost/content-map.json`. Keep structural/design fields
+   managed and routine owner fields editable.
+3. Provide the site's build/deploy workflow and scope its OIDC permissions to its resources.
+4. Configure the tenant's source repository, live branch, and optional preview branch/URL.
+5. Verify authorization, draft saving, preview isolation, publication tracking, and the
+   public result using the site's actual contract.
 
-There are now two deployment lanes:
+Preview deployment must stay beneath `/_preview/` and carry noindex. The production website
+is indexable where appropriate. A preview is not access-controlled merely because it is
+noindexed.
 
-- **Owner self-service:** `app.raizhost.com` writes allowed content and uploaded assets to the
-  client's source repository. The site's own GitHub Actions workflow builds, performs the four-pass
-  cache-control sync, and invalidates CloudFront. Git history is the restore path.
-- **RaizHost-managed changes:** structural/design work and older ops-repo sites still use the gated
-  command below. This path has a two-pass asset/HTML cache split and a deletion guard.
+## Ongoing changes
+
+Owner publication commits allowed content and uploaded images to the client repository.
+The site's workflow builds and deploys them. The [portal guide](app-raizhost-com.md) explains
+draft revisions, source conflicts, and when a publication may be called live.
+
+Managed structural changes use the site's reviewed code/deploy path. Older operations-hosted
+sites also have a separate update command:
 
 ```text
 node infra/site-update.mjs <slug> [--execute] [--allow-delete]
 ```
 
-Runs the site's own link/rendering checks, bumps a site-wide `?v=N` cache-bust, does the
-two-pass `s3 sync` with the proven cache-control split, invalidates `/*`, polls until complete,
-then verifies live 200s and headers. Deleted files are listed and the run aborts unless
-`--allow-delete` — the guard against syncing the wrong directory into a production bucket.
+That command owns its build/link checks, asset/HTML cache handling, invalidation, and
+deletion guard. It is not the portal's content-source publisher.
+
+**Source basis:** operations `infra/new-client-site.mjs`, `infra/site-update.mjs`, the client
+launch runbook, and the portal content contract. Current client count and onboarding status
+are outside this document's verification scope.

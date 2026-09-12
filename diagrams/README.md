@@ -1,23 +1,65 @@
 # Diagram workflow
 
-GitHub's Mermaid rendering is inconsistent across mobile clients, so public documents embed
-committed SVGs. The adjacent `.mmd` files remain the editable sources.
+Public documents embed committed SVGs with text alternatives. Each diagram is also linked
+at full size, so its detail remains available when GitHub scales it down on a phone.
 
-Run the renderer after changing `request-flow.mmd`, `deploy-flow.mmd`, or
-`client-provisioning.mmd`:
+## Choose the source
+
+| Diagram | Edit here | What it explains |
+| :-- | :-- | :-- |
+| System overview | [overview.py](overview.py) | Serving lanes, data boundaries, and owner publication |
+| Request routing | [request-flow.mmd](request-flow.mmd) | DNS versus HTTPS, origins, and direct browser APIs |
+| Code deployment | [deploy-flow.mmd](deploy-flow.mmd) | The distinct release trigger and artifact path for each repository |
+| Client delivery | [client-provisioning.mmd](client-provisioning.mmd) | Hosting authorization, resource creation, and site integration |
+| Owner publication | [owner-publishing.mmd](owner-publishing.mmd) | Draft, preview, live publication, and confirmation |
+| Tracker data | [llm-data-flow.mmd](llm-data-flow.mmd) | Scheduled collection versus reader requests |
+
+The overview generator produces **both** `architecture.svg` and `architecture.mmd` from
+one set of nodes and edges. Its explicit layout keeps the main map readable while the
+Mermaid sketch remains useful for inspecting topology. Do not edit either generated output
+by hand. `fonts.css` preserves the Inter subsets already embedded in the original diagram.
+
+## Render and check
+
+With Docker, Python 3, and the geometry check's font dependencies installed:
 
 ```bash
+python3 -m pip install fonttools brotli
 diagrams/render.sh
 ```
 
-The script uses the same pinned Mermaid CLI image and config as CI, removes an unused external
-Font Awesome import, adds an accessible title/description and opaque white canvas for dark-mode
-readability, and refreshes `rendered.sha256`. CI then:
+The renderer uses Mermaid CLI `11.4.2`, matching CI. For a local CLI installation of that
+same version, set `MMDC_BIN` to its executable. An optional `PUPPETEER_CONFIG` file lets
+the CLI reuse an installed browser. Browser/download prerequisites belong to the local
+environment; they are not production application dependencies.
 
-1. renders every Mermaid source to prove the syntax;
-2. rejects inline Mermaid fences in public Markdown;
-3. rejects a changed source or rendered SVG whose manifest was not refreshed; and
-4. runs the custom geometry checker against the hand-drawn overview SVG.
+The script renders flows, adds descriptive titles and a white canvas, strips external
+stylesheet imports, and refreshes the source/SVG checksums. The SVG canvas keeps diagram
+text readable in GitHub's light and dark themes.
 
-`architecture.svg` is deliberately hand-drawn and checked by `check.py`; `architecture.mmd` is an
-editable structural sketch, not its byte-generating source.
+Run the lightweight checks without rerendering:
+
+```bash
+python3 diagrams/overview.py --check
+python3 diagrams/check_docs.py
+python3 diagrams/check.py
+```
+
+CI additionally lints Markdown, renders **all six** Mermaid files to validate syntax, and
+checks public documentation for private identifiers. The checks cover:
+
+- Overview source/output agreement.
+- Every Mermaid source and SVG in the render manifest.
+- Local documentation links, SVG embeds, and image text alternatives.
+- Portable SVG structure, responsive viewBox, and opaque background.
+- Overview labels fitting their boxes, label collisions, and lines crossing text, measured
+  with the actual embedded font metrics.
+
+These checks cannot establish that an arrow matches production. Review diagram semantics
+against the owning application source and dated deployment/live evidence. Inspect generated
+flows visually, including desktop and 375/412/430px document widths; each guide's prose and
+tables must explain the path without relying on tiny diagram labels.
+
+The overview's 16px headings and 14px node descriptions are checked by matching metrics in
+`check.py`. Update those metrics if the typography changes. Keep a meaningful geometry
+failure check when changing the generator or checker.

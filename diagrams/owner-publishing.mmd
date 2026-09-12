@@ -1,0 +1,22 @@
+flowchart TB
+  owner["Owner signs in"] --> portal["Portal on anchor<br/>Authorize tenant and fields"]
+  source["Client repository<br/>content-map.json + content.json"] -->|"read at one source revision"| portal
+  portal -->|"Save: expected revision must match"| draft[("Postgres draft<br/>Persistent revision token")]
+  draft --> action{"Owner action"}
+
+  action -->|"Preview"| preview["Commit content + images<br/>Preview branch"]
+  preview --> previewBuild["Client workflow builds preview"]
+  previewBuild --> previewS3["S3 /_preview/ only<br/>Noindex; public root unchanged"]
+
+  action -->|"Publish"| commit["Check live source head<br/>Commit content + images to live branch"]
+  commit --> build["Client workflow builds site"]
+  build --> s3["Upload public S3 output<br/>Invalidate CloudFront"]
+  s3 --> result{"Exact commit's workflow result"}
+  result -->|"success"| live["Portal confirms update live"]
+  result -->|"failed"| failed["Report failure<br/>Public objects may be partly updated"]
+  result -->|"lookup unavailable / still running"| pending["Retain last confirmed status<br/>Bounded reconciliation"]
+
+  classDef data fill:#ecfdf5,stroke:#047857,color:#172b35
+  classDef choice fill:#fff7ed,stroke:#c2410c,color:#172b35
+  class source,draft,previewS3,s3,live data
+  class action,result choice

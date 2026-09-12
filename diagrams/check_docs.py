@@ -6,14 +6,12 @@ import hashlib
 import pathlib
 import re
 import sys
+from urllib.parse import unquote, urlsplit
 
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-PAIRS = {
-    "request-flow.mmd": "request-flow.svg",
-    "deploy-flow.mmd": "deploy-flow.svg",
-    "client-provisioning.mmd": "client-provisioning.svg",
-}
+PAIRS = {path.name: path.with_suffix(".svg").name
+         for path in sorted((ROOT / "diagrams").glob("*.mmd"))}
 MANIFEST = ROOT / "diagrams" / "rendered.sha256"
 
 
@@ -22,11 +20,25 @@ def digest(path: pathlib.Path) -> str:
 
 
 issues: list[str] = []
-markdown_paths = [ROOT / "README.md", *sorted((ROOT / "docs").glob("*.md"))]
+markdown_paths = sorted(path for path in ROOT.rglob("*.md")
+                        if not any(part in {".git", "node_modules"} for part in path.parts))
 for path in markdown_paths:
     text = path.read_text(encoding="utf-8")
     if re.search(r"^```mermaid\s*$", text, flags=re.MULTILINE):
         issues.append(f"{path.relative_to(ROOT)}: inline Mermaid is not mobile-safe; embed an SVG")
+    # Catch broken local navigation as well as missing diagram files. External
+    # source links are checked independently against the inspected repositories.
+    links = re.findall(r"\[[^\]]+\]\(([^)]+)\)", text)
+    links += re.findall(r'(?:src|href)="([^"]+)"', text)
+    for link in links:
+        parsed = urlsplit(link.strip("<>"))
+        if parsed.scheme or parsed.netloc or not parsed.path:
+            continue
+        target = (path.parent / unquote(parsed.path)).resolve()
+        if not target.is_relative_to(ROOT):
+            issues.append(f"{path.relative_to(ROOT)}: local link escapes repository: {link}")
+        elif not target.exists():
+            issues.append(f"{path.relative_to(ROOT)}: missing local link target: {link}")
 
 manifest: dict[str, str] = {}
 if not MANIFEST.exists():
@@ -76,6 +88,8 @@ for output_name in PAIRS.values():
     if not tags:
         issues.append(f"diagrams/{output_name}: rendered asset is not embedded anywhere")
     for path, tag in tags:
+        if not re.search(r'alt="[^\"]+"', tag):
+            issues.append(f"{path.relative_to(ROOT)}: {output_name} needs descriptive alt text")
         if 'width="100%"' not in tag:
             issues.append(
                 f"{path.relative_to(ROOT)}: {output_name} embed must use width=\"100%\""
