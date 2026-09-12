@@ -1,0 +1,22 @@
+flowchart TB
+  request["Connected-site content write<br/>Save, preview, or publish"]
+  request --> session{"Valid Better Auth session?"}
+  session -->|"No"| unauthenticated["401 — sign in"]
+  session -->|"Yes"| tenant{"Tenant and source found?<br/>Admin or tenant member"}
+  tenant -->|"No"| missing["404 — website unavailable"]
+  tenant -->|"Yes"| role{"Platform admin<br/>or tenant editor / owner?"}
+  role -->|"No: viewer"| forbidden["403 — edit access required"]
+  role -->|"Yes"| billing{"Admin, billing disabled,<br/>or billing allows editing?"}
+  billing -->|"No"| locked["402 — billing locked"]
+  billing -->|"Yes"| validate["Check requested action<br/>Content permissions and values<br/>Draft revision + source head"]
+  validate -->|"Rejected"| rejected["Return action-specific error<br/>Resolve fields or revision conflict"]
+  validate -->|"Accepted save"| draft["Store Postgres draft<br/>Public site does not change"]
+  validate -->|"Accepted preview / publish"| commit["Commit to explicit target branch<br/>Client workflow deploys site output"]
+  commit --> confirmed["Portal confirms successful run<br/>for that content commit"]
+
+  classDef gate fill:#fff7ed,stroke:#c2410c,color:#172b35
+  classDef denied fill:#fff1f2,stroke:#be123c,color:#172b35
+  classDef result fill:#ecfdf5,stroke:#047857,color:#172b35
+  class session,tenant,role,billing gate
+  class unauthenticated,missing,forbidden,locked,rejected denied
+  class draft,confirmed result

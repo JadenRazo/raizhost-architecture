@@ -1,0 +1,19 @@
+flowchart TB
+  job["Release job passes its<br/>repository-specific event gates"]
+  job --> runner["Workflow selects its runner<br/>GitHub-hosted or portal CodeBuild"]
+  runner -. "CodeBuild only" .-> service["Runner service role<br/>GitHub connection token + own logs<br/>No production deploy grant"]
+  runner -->|"id-token: write"| token["GitHub issues signed OIDC token"]
+  token --> trust{"AWS STS accepts<br/>issuer, audience, subject?"}
+  trust -->|"No"| identityDenied["Assume-role denied<br/>No deploy-role session"]
+  trust -->|"Yes"| session["Temporary AWS credentials<br/>for the deployment role"]
+  session --> permission{"IAM permits this<br/>action on this resource?"}
+  permission -->|"No"| actionDenied["This operation is denied<br/>Earlier operations may have run"]
+  permission -->|"Yes"| action["Perform permitted release step<br/>S3 / ECR / Lambda / SSM / CDN"]
+  action --> verify["Run application-specific<br/>release verification"]
+
+  classDef gate fill:#fff7ed,stroke:#c2410c,color:#172b35
+  classDef denied fill:#fff1f2,stroke:#be123c,color:#172b35
+  classDef result fill:#ecfdf5,stroke:#047857,color:#172b35
+  class trust,permission gate
+  class identityDenied,actionDenied denied
+  class verify result

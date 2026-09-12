@@ -6,9 +6,9 @@
 owner portal, tracker, and client delivery. Recheck the affected rows after a release or
 topology change; review this snapshot by **2026-10-12**.
 
-Three evidence levels matter: source describes implementation, a successful workflow
-records a release, and a live response reports what an endpoint observed at a particular
-time. None alone is a full AWS inventory or a recovery test.
+Source describes implementation, a successful workflow records a release, live GitHub
+settings establish configured gates, and a live response reports what an endpoint observed
+at a particular time. None alone is a full AWS inventory or a recovery test.
 
 ## Application revisions inspected
 
@@ -21,6 +21,23 @@ time. None alone is a full AWS inventory or a recovery test.
 
 Tracker source is public. Other evidence includes private repositories; this page publishes
 the relevant behavior and revisions without exposing their resource identifiers or credentials.
+
+## GitHub gate settings
+
+Read on **2026-09-12 UTC** through the authenticated GitHub REST API:
+
+| Read | Result used in the diagrams and guides |
+| :-- | :-- |
+| `repos/JadenRazo/{repo}/branches/main/protection` for the four repositories above | Portal requires `build` and `e2e`; tracker requires `Typecheck, lint, build`; both require an up-to-date branch. Marketing and infrastructure have no required status checks configured |
+| Approving-review count in those protections | 0 for all four; conversation resolution and administrator enforcement enabled |
+| `repos/JadenRazo/{repo}/rules/branches/main` | Empty for all four: no additional active ruleset rules returned |
+| `repos/JadenRazo/raizhost/environments/production` | No protection rules; no deployment branch policy |
+
+These settings can change independently of a commit. Recheck them when modifying release
+gates. [CI/CD](ci-cd.md) explains the consequences; [authorization](authorization.md)
+separates configured checks from operator approval. Workflow source establishes that the
+portal and tracker deploy jobs do not declare an environment gate. No GitHub protection
+setting or application workflow was changed for this documentation expansion.
 
 ## Deployment and live observations
 
@@ -65,6 +82,7 @@ actions. A legacy hook file is not proof that a hook executed in a Codex session
 | Current routing, instance sizing, schedules, and resource totals | Read-only AWS/Cloudflare inventory against application origins and the operations AWS map | No fresh fleet counts, instance-size claims, or schedule-health guarantees here |
 | Current cost | Whole-account billing over a stated period, separating serving, operations, CI, and retained resources | Earlier serving-core and scheduled-total estimates are historical; no current monthly bill is asserted |
 | Terraform drift | Current state reconciliation and reviewed plan under the infrastructure runbook | Keep the documented live-automation hold until its owner resolves it |
+| Live deployment trust and grants | Read deployed IAM trust/resource policies and CodeConnections installation scope against the inspected OIDC/runner declarations | The identity diagram describes the mechanism and source configuration, not a fresh least-privilege audit |
 | Backup recovery | Recent dump/snapshot evidence and an isolated restore exercise with recorded results | Backup configuration does not establish a recovery objective |
 | Portal GitHub credential migration and owner onboarding | Runtime configuration and completed handoff evidence | Adapter capability is documented without declaring rollout complete |
 | Client hosting details | Each site's source workflow, resource registry, and live preview/public checks | No universal cache, rollback, or preview-access guarantee |

@@ -14,6 +14,10 @@ the EC2 anchor. Postgres stores accounts, tenant membership, drafts, and publica
 Better Auth handles authentication; server-side checks enforce membership, role, subscription,
 and permitted fields. An owner-facing control is only the interface to those checks.
 
+The [portal authorization diagram](authorization.md#portal-content-authorization) shows
+the session, tenant, write-role and conditional billing gates, including their rejection
+paths. Read access and write access follow different checks.
+
 Authenticated pages and APIs must not share personalized responses through a public cache.
 Static bundles have a different caching policy. The historical portal Lambda was retired;
 the current release workflow deploys a container through ECR and SSM.
@@ -86,6 +90,8 @@ restoring public output still requires a new successful deployment.
 The older Puck page-builder renderer has a separate direct-publication implementation. The
 flow above describes connected, hand-built client websites. Releasing portal code is also
 separate from an owner pressing Publish.
+
+For portal code, follow [CI/CD](ci-cd.md) into the [rollout and rollback gates](release-verification.md#portal-rollout-and-rollback).
 
 **Source basis:** `raizhost-app`'s content contract, `src/lib/content/`, authentication checks,
 and anchor deployment workflow at the revision in [current state](current-state.md).

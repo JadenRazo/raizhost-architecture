@@ -13,6 +13,10 @@ at full size, so its detail remains available when GitHub scales it down on a ph
 | Client delivery | [client-provisioning.mmd](client-provisioning.mmd) | Hosting authorization, resource creation, and site integration |
 | Owner publication | [owner-publishing.mmd](owner-publishing.mmd) | Draft, preview, live publication, and confirmation |
 | Tracker data | [llm-data-flow.mmd](llm-data-flow.mmd) | Scheduled collection versus reader requests |
+| CI/CD | [ci-cd-flow.mmd](ci-cd-flow.mmd) | PR checks, manual/automatic release gates, and exact revision selection |
+| Deployment identity | [deployment-identity.mmd](deployment-identity.mmd) | Runner role, GitHub OIDC, AWS trust, and per-operation permission |
+| Portal authorization | [portal-authorization.mmd](portal-authorization.mmd) | Session, tenant, role, billing, and content mutation gates |
+| Portal rollout | [portal-rollout.mmd](portal-rollout.mmd) | Preparation, candidate health, eligible rollback, and recovery confirmation |
 
 The overview generator produces **both** `architecture.svg` and `architecture.mmd` from
 one set of nodes and edges. Its explicit layout keeps the main map readable while the
@@ -45,7 +49,7 @@ python3 diagrams/check_docs.py
 python3 diagrams/check.py
 ```
 
-CI additionally lints Markdown, renders **all six** Mermaid files to validate syntax, and
+CI additionally lints Markdown, discovers and renders **every** Mermaid file to validate syntax, and
 checks public documentation for private identifiers. The checks cover:
 
 - Overview source/output agreement.

@@ -6,6 +6,10 @@ Each repository owns its release workflow. GitHub Actions uses OpenID Connect (O
 assume a scoped AWS role. Runner permissions and deployment permissions are distinct:
 obtaining a runner does not itself grant permission to change production.
 
+Start with [CI/CD](ci-cd.md) for the path from PR checks to release selection, and
+[authorization gates](authorization.md) for operator approval, AWS identity and application
+access. This page follows the artifacts after a release is selected.
+
 <p align="center">
   <a href="../diagrams/deploy-flow.svg"><img src="../diagrams/deploy-flow.svg" alt="Marketing uses a manually approved exact-commit deployment to build Astro and upload S3 output. The owner app deploys the image built by successful push CI on main through ECR and SSM, with a container health check and rollback. LLM Tracker deploys its web image, static bundles, and three poller ZIPs after CI or a manual dispatch. Client content commits use each client repository's workflow." width="100%"></a>
 </p>
@@ -60,6 +64,9 @@ another.
 A live S3 sync can partially change public objects before failure. Restoring a known Git
 revision or image identifies a recovery artifact; rollout and verification still have to
 complete.
+
+[Release verification and recovery](release-verification.md) diagrams the portal's
+health/rollback decisions and compares the guarantees of all three application workflows.
 
 ## Infrastructure changes
 
