@@ -78,6 +78,9 @@ database reads, and scheduled collection. Static website delivery follows its ow
 | [LLM Tracker](docs/llm-raizhost-com.md) | Where does the data come from, and how does it reach a page? |
 | [Website and inquiries](docs/raizhost-com.md) | How do the static website, quote form, and CRM work together? |
 | [Deployment flow](docs/deploy-flow.md) | Which workflows release each application? |
+| [CI/CD](docs/ci-cd.md) | What runs on a PR, which checks block merging, and what selects a release? |
+| [Authorization gates](docs/authorization.md) | Who may release code, obtain AWS permissions, or change a client's content? |
+| [Release verification and recovery](docs/release-verification.md) | What proves a rollout succeeded, and what happens after a partial failure? |
 | [Client provisioning](docs/client-provisioning.md) | How does a client get hosting and an editable site? |
 | [Design decisions](docs/decisions.md) | Why use this mix of static hosting, Lambda, and EC2? |
 | [Current state](docs/current-state.md) | Which claims were checked, and what still needs verification? |

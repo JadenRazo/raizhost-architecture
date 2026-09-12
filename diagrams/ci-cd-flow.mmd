@@ -1,0 +1,29 @@
+flowchart TB
+  subgraph marketing["raizhost.com — manual production release"]
+    direction TB
+    mchange["PR or push<br/>main / staging"] --> mci["CI quality suite<br/>Build, contracts, browser checks"]
+    mci -. "Operator reviews evidence" .-> dispatch["Manual Deploy dispatch<br/>Full commit SHA<br/>approve_production = true"]
+    dispatch --> mcheck["Checkout equals requested SHA<br/>Run deployment checks"]
+    mcheck --> mship["OIDC role → S3 upload<br/>Request CDN invalidation"]
+  end
+
+  subgraph portal["app.raizhost.com — push CI publishes the image"]
+    direction TB
+    pchange["Same-repository PR<br/>or push to main"] --> pchecks["CI: build + e2e<br/>Types, lint, tests, browser journey"]
+    pchecks -->|"Push to main only"| image["Publish ARM64 image to ECR<br/>Tag = CI commit SHA"]
+    image --> pgate["Deploy requires successful CI<br/>push + main + same repository"]
+    pgate --> pship["Deploy exact CI head SHA<br/>OIDC role → SSM on anchor"]
+  end
+
+  subgraph tracker["llm.raizhost.com — automatic or manual release"]
+    direction TB
+    tchange["PR or push to main"] --> tci["CI: types, lint, read/UI tests<br/>Build, prerender guard, poller bundle"]
+    tci -->|"Successful CI on main"| tsha["Select deployment revision<br/>CI head SHA or dispatch SHA"]
+    manual["Manual Deploy dispatch<br/>No CI-success prerequisite"] --> tsha
+    tsha --> tship["OIDC role → web image<br/>Static assets + three poller ZIPs"]
+  end
+
+  classDef decision fill:#fff7ed,stroke:#c2410c,color:#172b35
+  classDef output fill:#ecfdf5,stroke:#047857,color:#172b35
+  class dispatch,manual,pgate decision
+  class mship,pship,tship output

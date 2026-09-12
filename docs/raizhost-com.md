@@ -59,5 +59,10 @@ and deletion policy.
 Quote and CRM functions have separate deployment commands. Shipping `dist/` does not update
 their Lambda code. A portal release does not deploy the marketing website either.
 
+The [CI/CD guide](ci-cd.md) shows which checks run before release selection.
+[Authorization](authorization.md) distinguishes the dispatch approval input from GitHub
+environment protections; [release verification](release-verification.md) records what the
+workflow checks after upload.
+
 **Source basis:** `raizhost`'s deployment workflow, browser API clients, and
 `functions/quotes/` / `functions/sales-crm/`, at the revision in [current state](current-state.md).

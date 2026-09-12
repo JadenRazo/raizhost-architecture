@@ -101,6 +101,11 @@ this is coordinated deployment, not an atomic multi-function transaction.
 The manual poll endpoint is an authenticated write operation, not a health probe. Routine
 documentation and status checks must not invoke it.
 
+[CI/CD](ci-cd.md) diagrams the automatic and manual release triggers.
+[Authorization](authorization.md) explains deployment identity and the manual route's
+access boundary; [release verification](release-verification.md) describes the exact smoke
+checks and recovery limits.
+
 **Source basis:** [poller implementation](https://github.com/JadenRazo/llm-tracker/tree/457f1f14544f4de3ebdfa6115a3b8537b37baea2/src/lib/poller),
 [cache configuration](https://github.com/JadenRazo/llm-tracker/blob/457f1f14544f4de3ebdfa6115a3b8537b37baea2/next.config.ts),
 [deployment workflow](https://github.com/JadenRazo/llm-tracker/blob/457f1f14544f4de3ebdfa6115a3b8537b37baea2/.github/workflows/deploy.yml),

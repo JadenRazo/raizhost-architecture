@@ -1,0 +1,21 @@
+flowchart TB
+  revision["Deploy uses exact successful CI head SHA"]
+  revision --> prepare["Install and verify reviewed deploy script<br/>Apply allowlisted additive migrations"]
+  prepare -->|"Success"| candidate["Refresh environment; pull SHA-tagged image<br/>Start candidate container"]
+  prepare -->|"Failure"| stopped["Release fails before container switch<br/>Inspect completed preparation steps"]
+  candidate --> health{"Expected running image<br/>and container healthy?"}
+  health -->|"Yes"| record["Record last-good SHA<br/>Request CDN invalidation: best effort"]
+  record --> success["SSM terminal Success<br/>Deploy job accepts release"]
+  health -->|"Start / health failure"| prior{"Valid, distinct<br/>last-good SHA available?"}
+  prior -->|"No"| unknown["Recovery unconfirmed<br/>Release fails"]
+  prior -->|"Yes"| rollback["Start previous image<br/>Keep additive migrations installed"]
+  rollback --> recovered{"Previous image running<br/>and healthy?"}
+  recovered -->|"No"| unknown
+  recovered -->|"Yes"| restored["Prior image healthy<br/>Rejected release still fails"]
+
+  classDef gate fill:#fff7ed,stroke:#c2410c,color:#172b35
+  classDef denied fill:#fff1f2,stroke:#be123c,color:#172b35
+  classDef result fill:#ecfdf5,stroke:#047857,color:#172b35
+  class health,prior,recovered gate
+  class stopped,unknown denied
+  class success,restored result
