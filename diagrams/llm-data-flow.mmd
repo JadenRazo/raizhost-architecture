@@ -1,0 +1,25 @@
+flowchart TB
+  subgraph COLLECT["Scheduled collection"]
+    scheduler["EventBridge Scheduler<br/>10 min / 30 min / 2 h"] --> workers["Three tier Lambdas<br/>Shared ZIP; tier configuration"]
+    registry["Source registry<br/>Provider + key + parser + tier"] -. "bundled into" .-> workers
+    workers -->|"HTTPS fetch through anchor NAT"| upstream["Provider APIs and docs<br/>npm, GitHub releases, status feeds"]
+    upstream -->|"responses"| normalize["Parse, normalize, deduplicate<br/>Keep source URLs and timestamps"]
+    normalize -->|"data + run outcomes"| writePool["PgBouncer on anchor"]
+  end
+
+  subgraph READ["Reader requests"]
+    reader["Reader / RSS client"] --> cf["CloudFront"]
+    cf -->|"hashed bundles via OAC"| assets["S3 /_next/static/*"]
+    cf -->|"page / feed, cache miss"| api["HTTP API Gateway"]
+    api --> web["Next.js web Lambda<br/>DISABLE_CRON=1"]
+    markdown["Curated Markdown"] -. "ships with image" .-> web
+    web -->|"query stored records"| readPool["PgBouncer on anchor"]
+  end
+
+  writePool --> db[("Tracker Postgres database<br/>Events, catalogs, references, poller runs")]
+  readPool --> db
+
+  classDef data fill:#ecfdf5,stroke:#047857,color:#172b35
+  classDef edge fill:#fff7ed,stroke:#c2410c,color:#172b35
+  class assets,db data
+  class cf,scheduler edge
