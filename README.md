@@ -20,10 +20,12 @@ Start with the map, then follow an application from a user action to its stored 
 | [llm.raizhost.com](https://llm.raizhost.com) | Follow provider releases, models, status, CLI references, and RSS feeds | Next.js web Lambda reads Postgres; separate scheduled Lambdas collect data | [LLM Tracker](docs/llm-raizhost-com.md) |
 | Client sites and [demos](https://demos.raizhost.com) | Visit a business website or review an example | Static files in S3 behind CloudFront | [Client delivery](docs/client-provisioning.md) |
 
-> **Evidence checked 2026-09-12.** Application source and successful deployment runs were
-> inspected, alongside public health responses. AWS inventory, current billing, and backup
-> recovery were not reverified. [Current state and evidence](docs/current-state.md) records
-> the exact revisions and the limits of those checks.
+> **Cloud controls updated 2026-10-08.** Audit logging, encrypted storage defaults,
+> backup verification and table-deletion protection are live. September gross usage
+> was **$127.32**; the live gross budget is **$250/month across all AWS workloads**.
+> The serving topology remains single-AZ; automatic failover is a future milestone.
+> [Cloud operations](docs/cloud-operations.md) separates the operating baseline from the
+> target design. [Current evidence](docs/current-state.md) preserves each audit's scope.
 
 ## Start with the action
 
@@ -35,6 +37,7 @@ Start with the map, then follow an application from a user action to its stored 
 | A visitor opens a page or submits an inquiry | [Request routing](docs/request-flow.md) and [website APIs](docs/raizhost-com.md) |
 | A provider releases an LLM update | [Scheduled collection → database → dashboard / RSS](docs/llm-raizhost-com.md) |
 | A new client needs hosting and owner access | [Provisioning and content-source connection](docs/client-provisioning.md) |
+| Infrastructure needs a cost, security or recovery change | [Cloud operations and staged resilience](docs/cloud-operations.md) |
 
 For example, **Publish in the owner portal** saves the latest draft, checks permission and
 source revisions, and commits content to the **client site's repository**. That branch push
@@ -107,6 +110,7 @@ database reads, and scheduled collection. Static website delivery follows its ow
 | [Client provisioning](docs/client-provisioning.md) | How does a client get hosting and an editable site? |
 | [Design decisions](docs/decisions.md) | Why use this mix of static hosting, Lambda, and EC2? |
 | [Current state](docs/current-state.md) | Which claims were checked, and what still needs verification? |
+| [Cloud operations](docs/cloud-operations.md) | What is the current cost/recovery baseline, and what gates the planned two-AZ platform? |
 
 ## Maintaining this guide
 
@@ -118,5 +122,10 @@ data collection.
 Keep private resource identifiers and credentials out of this repository. Update the
 relevant walkthrough, diagram, and dated evidence together when a path changes. Diagram
 sources, rendering commands, and validation are described in [the diagram guide](diagrams/README.md).
+
+For infrastructure batches, collect the final live verification first, then make one
+consolidated update to this repository. Keep the deployed diagram, cost, trust boundaries,
+recovery limits and evidence dates consistent. Prepared code and planned controls must
+remain labeled until their deployment and acceptance checks have actually completed.
 
 Architecture documentation is licensed under [CC BY 4.0](LICENSE).

@@ -84,9 +84,11 @@ Terraform records the original core, CloudFormation owns the runner factory, and
 provisioning scripts produce import maps. Recorded out-of-band changes mean source is not
 proof of a drift-free account.
 
-Live Terraform automation remains held in the inspected workflow. Current inventory,
+Legacy-root Terraform automation remains held in the inspected workflow. Current inventory,
 a reviewed no-op reconciliation, and tested recovery are prerequisites to changing that
-operational posture. Architecture documentation does not change it.
+operational posture. The October foundation stack uses its own state boundary and
+was applied only after ownership checks and a reviewed non-destructive plan; its
+post-apply plan showed no changes. This does not reconcile the legacy root.
 
 ## Cost reporting follows evidence
 
@@ -97,3 +99,9 @@ monthly-cost claim and stale resource totals.
 Measure billing over a stated period, separate serving and operations/CI costs, and include
 storage, networking, and retained resources. A budget alert is a notification, not a hard
 spending cap.
+
+The [October cloud operations record](cloud-operations.md) contains the measured
+September gross cost, current budget and conditional migration target. The first
+batch prioritizes auditability, reliable backups and demonstrated logical recovery
+without adding a new compute fleet. Two-AZ managed services come after application
+state, database compatibility, dependency retirement and cost gates pass.
