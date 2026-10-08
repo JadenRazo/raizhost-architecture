@@ -67,8 +67,10 @@ preflight tests selected reads before writes, not every permission needed later.
 
 Keep the recovery artifact and the verification evidence tied to the intended revision.
 Production recovery follows the same effect-authorization rules as the original release.
-The [evidence record](current-state.md) lists the inspected source; this documentation work
-did not exercise a production rollback or database restore.
+The [evidence record](current-state.md) lists the inspected source. The September
+documentation audit did not exercise production rollback or restoration; the
+[October cloud record](cloud-operations.md) adds a measured isolated logical
+database restore, with its remaining application-recovery limits.
 
 **Source basis:** portal `ops/anchor/deploy.sh`, Compose health probe and deploy workflow;
 marketing/tracker deploy workflows; portal publication tracking.

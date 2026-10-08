@@ -2,6 +2,46 @@
 
 [System overview](../README.md) · [Design decisions](decisions.md)
 
+## Cloud follow-up — October 8, 2026
+
+AWS CLI and bounded host/SQL inspection established the baseline, followed by
+reviewed, authorized infrastructure changes. [Cloud operations](cloud-operations.md) is the current authority
+for the facts in this table; the September application and release evidence below
+remains a dated record, not a new check of every application workflow.
+
+| Observation | What it establishes |
+| :-- | :-- |
+| September gross AWS cost excluding credits/refunds: $127.32 | A measured monthly baseline, not the credit-adjusted bill or a per-client allocation |
+| October forecast $120.78 and estimated month-to-date $25.22 | Point-in-time budget/billing signals; not the completed October bill |
+| Anchor and operations host share one Availability Zone | Current EC2 topology does not provide AZ failover |
+| Operations host still carries production dependencies | Scheduling it off is not yet an accepted cost saving |
+| New backup scripts are installed; exact S3 versions passed checksum/content checks | Archive completion and media coverage verified; active media is empty |
+| Ten connectable databases restored into isolated PostgreSQL 17.11 | Loading 6m04s; full rehearsal 7m11s; extension/index checks and editor integrity pass; no application failover claim |
+| PostgreSQL 17.10; retained inactive data is outside logical-dump coverage | Migration and recovery must account for retained data separately |
+| Owner portal runs `9f614b8549d76d9163dc95fc953c52001079278d` | CI and Deploy passed; public/host health report exact SHA and DB up; Node 22.23.3, Next 15.5.27, Sharp 0.35.5 and native JPEG/WebP/AVIF checks verified |
+| Isolated foundation stack: 11 additions applied, zero replacements/deletions; subsequent no-change plan | Code and live controls agree within this stack; legacy root remains held |
+| CloudTrail delivered logs; 2/2 digests and 26/26 log files validated | Completed first-hour window, with private/versioned audit storage; not immutable or organization-wide logging |
+| Regional EBS encryption default and external-access analysis enabled | Default protects new regional volumes; 12 initial non-public trust findings inspected and left active for review |
+| Gross budget $250; 80/90/100% actual and 90% forecast alerts | Preserved recipients and Credit/Refund exclusions; notifications do not enforce a hard cap |
+| CRM and quotes tables deletion-protected, 35-day PITR retained | Live protection and owning bootstrap sources reconciled; item deletion and restores remain separate concerns |
+
+Foundation, backup and table-source changes passed independent review and relevant
+tests. The live database was not a restoration target: the drill used an isolated,
+disposable copy, which was removed after verification. Application image-processing
+patches and a pinned ECR Public build image passed deployment and final live checks.
+DNS, serving topology and production database placement were not
+changed. Future failover work follows the gates in the cloud-operations guide.
+
+The final application [CI run](https://github.com/JadenRazo/raizhost-app/actions/runs/37841355709)
+and [Deploy run](https://github.com/JadenRazo/raizhost-app/actions/runs/37843300310)
+completed successfully; deployment finished at 20:59:15 UTC. Public health was
+checked at 21:44 UTC, followed by host/native-library and backup-preservation checks.
+Those workflow links may require private-repository access. The earlier Docker Hub
+rate-limit failure stopped before image publication; the pinned ECR Public source
+resolved it through a new tested release.
+
+## September application audit
+
 **Documentation check: 2026-09-12 UTC.** This is a scoped record for RaizHost's website,
 owner portal, tracker, and client delivery. Recheck the affected rows after a release or
 topology change; review this snapshot by **2026-10-12**.
@@ -87,7 +127,7 @@ from a newly performed photo upload. These distinctions are explicit in the walk
 ## Infrastructure and operations evidence
 
 The operations AWS map contains a mixture of older full inventory reads and later
-application-specific corrections. Its latest heading date is not a fresh inventory. In this
+application-specific corrections. Its latest heading date is not a fresh inventory. In that September
 session, the AWS CLI had no active credentials, so a live distribution/routing inventory
 could not be completed. Infrastructure diagrams therefore reflect inspected application
 source, infrastructure declarations, and recorded corrections; they are not a claim that
@@ -110,11 +150,11 @@ actions. A legacy hook file is not proof that a hook executed in a Codex session
 
 | Item | Owning evidence to obtain | Documentation consequence |
 | :-- | :-- | :-- |
-| Current routing, instance sizing, schedules, and resource totals | Read-only AWS/Cloudflare inventory against application origins and the operations AWS map | No fresh fleet counts, instance-size claims, or schedule-health guarantees here |
-| Current cost | Whole-account billing over a stated period, separating serving, operations, CI, and retained resources | Earlier serving-core and scheduled-total estimates are historical; no current monthly bill is asserted |
+| Broader routing and account inventory | Extend the October scoped AWS inspection to other-region, learning-account and client details as needed | October host/topology facts above have a stated scope; no universal fleet or schedule guarantee |
+| Ongoing cost | Recheck whole-account gross billing after the new controls and CI usage appear | September usage and October forecast above are dated observations; validate the later steady-state target before migration |
 | Terraform drift | Current state reconciliation and reviewed plan under the infrastructure runbook | Keep the documented live-automation hold until its owner resolves it |
 | Live deployment trust and grants | Read deployed IAM trust/resource policies and CodeConnections installation scope against the inspected OIDC/runner declarations | The identity diagram describes the mechanism and source configuration, not a fresh least-privilege audit |
-| Backup recovery | Recent dump/snapshot evidence and an isolated restore exercise with recorded results | Backup configuration does not establish a recovery objective |
+| Remaining recovery work | Retained disabled-data snapshot restoration, application correctness, PITR and failure drills | The completed logical rehearsal does not establish complete application, AZ or regional recovery |
 | Portal GitHub credential migration and owner onboarding | Runtime configuration and completed handoff evidence | Adapter capability is documented without declaring rollout complete |
 | Client hosting details beyond the Showers example | Each site's source workflow, resource registry, tenant mapping and live preview/public checks | The concrete Showers pipeline is documented; no universal cache, rollback, preview-access or completed-onboarding guarantee |
 
