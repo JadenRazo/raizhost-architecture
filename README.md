@@ -20,8 +20,8 @@ Start with the map, then follow an application from a user action to its stored 
 | [llm.raizhost.com](https://llm.raizhost.com) | Follow provider releases, models, status, CLI references, and RSS feeds | Next.js web Lambda reads Postgres; separate scheduled Lambdas collect data | [LLM Tracker](docs/llm-raizhost-com.md) |
 | Client sites and [demos](https://demos.raizhost.com) | Visit a business website or review an example | Static files in S3 behind CloudFront | [Client delivery](docs/client-provisioning.md) |
 
-> **Cloud controls updated 2026-10-08.** Audit logging, encrypted storage defaults,
-> backup verification and table-deletion protection are live. September gross usage
+> **Cloud controls updated 2026-10-09.** Audit logging, encrypted storage defaults,
+> verified backups, independent backup alarms and table-deletion protection are live. September gross usage
 > was **$127.32**; the live gross budget is **$250/month across all AWS workloads**.
 > The serving topology remains single-AZ; automatic failover is a future milestone.
 > [Cloud operations](docs/cloud-operations.md) separates the operating baseline from the

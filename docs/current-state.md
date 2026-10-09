@@ -2,6 +2,27 @@
 
 [System overview](../README.md) · [Design decisions](decisions.md)
 
+## Backup-monitoring follow-up — October 9, 2026
+
+The second accepted increment adds independent backup monitoring. This section
+updates that control and the budget; the October 8 and September records below
+retain their original scope and dates. Serving and deployment diagrams still
+describe the same application paths.
+
+| Observation | What it establishes |
+| :-- | :-- |
+| Deployed monitor code matches the reviewed package; both database/media checks healthy | Completion receipts and archive metadata are consistent and fresh at the read, not proof of newly restored data |
+| Two actual EventBridge invocations observed; both health alarms OK with actions enabled | The installed 15-minute schedule reports outside the anchor/VPC and is connected to the existing operator topic |
+| Separate alarm exercised missing, healthy and explicit-failure data with no actions, then was removed | Failure/recovery and missing-reporting detection were observed without synthetic notifications or backup changes |
+| Dedicated monitoring Terraform state returns no changes | Deployed resources and source agree; legacy root remains held |
+| Gross budget forecast $124.34; estimated month-to-date $29.10 | October 9 read of budget data updated October 8 at 23:40 UTC; the $250 ceiling and $25 design reserve remain |
+| Portal health at 01:08 UTC reports database up and `9f614b8549d76d9163dc95fc953c52001079278d` | The previously accepted release remains healthy; no app release occurred in this increment |
+| HTTPS origin/client-identity and machine-IAM changes have passing preparation checks and CI, but no independent review verdict | Prepared only: current HTTP origin and operations AdministratorAccess remain, with explicit follow-up ownership |
+
+[Cloud operations](cloud-operations.md) records the monitoring path, $3/month
+allowance, shared-concurrency limit, recovery boundaries and source PRs. No new
+application, AZ or regional failover capability is claimed.
+
 ## Cloud follow-up — October 8, 2026
 
 AWS CLI and bounded host/SQL inspection established the baseline, followed by

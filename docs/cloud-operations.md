@@ -2,7 +2,7 @@
 
 [System overview](../README.md) · [Dated evidence](current-state.md) · [Decisions](decisions.md)
 
-**Evidence date: October 8, 2026.** The live gross budget is **$250/month across
+**Evidence: October 8 foundations/recovery; October 9 monitoring and budget.** The live gross budget is **$250/month across
 production, operations and learning workloads**. The design target reserves $25
 and allocates up to $225 to planned usage. The controls below have been deployed
 and checked; the two-AZ migration remains conditional on the readiness gates.
@@ -26,8 +26,8 @@ not provide automatic application or database failover across AZs.
 | Measurement | USD | Meaning |
 | :-- | --: | :-- |
 | September gross AWS usage | 127.32 | Excludes credits and refunds; read through Cost Explorer |
-| October gross forecast | 120.78 | Point-in-time budget forecast, not a commitment |
-| October month-to-date | 25.22 | Still estimated at the October 8 read |
+| October gross forecast | 124.34 | Budget read October 9; point-in-time forecast, not a commitment |
+| October month-to-date | 29.10 | Estimated; budget data last updated October 8 at 23:40 UTC |
 | Program ceiling | 250.00 | Total AWS spend including temporary migration overlap |
 | Planned usage target | 225.00 | Conditional on sizing and removing replaced costs |
 | Reserve | 25.00 | Buffer inside the ceiling, not an extra allowance |
@@ -45,6 +45,12 @@ Revisit costs if scope, event selection or retention changes. Sources:
 [CloudTrail pricing](https://aws.amazon.com/cloudtrail/pricing/) and
 [Access Analyzer pricing](https://aws.amazon.com/iam/access-analyzer/pricing/).
 
+Independent backup monitoring adds a **$3/month planning allowance** for four
+custom metric series, two standard alarms, Lambda, requests and bounded logs.
+This is an allowance, not measured monthly spend or a service cap. No ALB, RDS or
+ECS capacity was added in the October 9 batch; the prepared HTTPS origin would
+add about $30/month for ALB hours, two public addresses and one average LCU.
+
 ## Deployed controls
 
 | Control | Live verification | Boundary |
@@ -56,14 +62,46 @@ Revisit costs if scope, event selection or retention changes. Sources:
 | External-access analyzer | Free account analyzer ACTIVE; 12 initial non-public IAM trust findings inspected against actual role policies | Findings remain active for intended-access and recovery review; no broad archive rules |
 | CRM and quote deletion protection | Both tables ACTIVE and protected; existing 35-day PITR retained | Does not prevent authorized item deletion or prove restoration |
 | Backup completion | New scripts require valid source coverage, successful archive upload and a final checksum receipt; unique keys separate concurrent runs | Media and logical database copies are not a coordinated application snapshot |
+| Independent backup monitoring | Scheduled Lambda checked both streams healthy; real scheduled execution verified; both missing-data alarms OK with actions enabled on the existing operator topic | Receipt/metadata checks do not prove restored data or notification delivery |
 
 The isolated foundation stack applied eleven resource/setting additions, with no
 replacements or deletions, and then produced a no-change Terraform plan. These
 controls use a separate state boundary. The table bootstrap sources now preserve
 deletion protection for both new and existing tables.
 
-The audit validation window was **18:24:33–19:24:33 UTC**. This is verification of
+The October 8 audit validation window was **18:24:33–19:24:33 UTC**. This is verification of
 delivered files for that completed interval, not a claim about all future logs.
+
+## Independent backup monitoring
+
+EventBridge invokes a small ARM Lambda every **15 minutes**, outside the VPC and
+independent of the anchor and its NAT function. It reads the newest completion
+receipt for each database/media stream and checks schema, coverage, timestamps,
+S3 versions, size and checksum metadata. A completed copy older than **26 hours**,
+an invalid receipt or a failed check emits unhealthy status; it never falls back
+to an older valid receipt to hide a newer broken one. It does not connect to the
+database, download archives, or write backup objects. Its IAM read grant is
+limited to the two backup prefixes and also permits archive reads.
+
+CloudWatch evaluates both health streams and treats missing metrics as breaching,
+covering a stopped scheduler or monitor as well as stale backups. AWS evaluation
+windows and service delays mean this is not an exact 30-minute detection promise.
+Logs retain 14 days. The account has ten unreserved concurrent Lambda executions;
+the monitor shares that pool and has no dedicated concurrency guarantee.
+
+Acceptance on October 9 verified the deployed code hash, actual healthy results,
+two scheduled invocations, both production alarms OK with notifications enabled,
+and a no-change plan in the dedicated Terraform state. A separate actionless
+alarm demonstrated missing-data failure, healthy recovery, explicit failure,
+recovery and missing-data failure again, then was deleted. Production backup
+data and thresholds were preserved. No synthetic emails were sent, no inbox
+delivery was claimed, and this exercise did not repeat the October 8 restore.
+
+Source and procedure are in [infrastructure PR 10](https://github.com/JadenRazo/aws-infra/pull/10)
+and its [quota correction](https://github.com/JadenRazo/aws-infra/pull/11).
+These links may require private-repository access. Investigate the alarm's
+stream, newest receipt, monitor logs and nightly job before changing thresholds;
+re-establish a valid backup and healthy independent checks after repairing the cause.
 
 ## Recovery evidence and limits
 
@@ -102,7 +140,7 @@ and an existing snapshot do not prove RDS compatibility or restoration.
 
 | Milestone | Work | Evidence required for completion |
 | :-- | :-- | :-- |
-| Week 1 | Foundation controls, verified backup archives and a measured logical restore are complete | Continue checking delivery, freshness and coverage; preserve the stated recovery scope |
+| Week 1 | Foundation controls, verified archives, measured logical restore and independent backup monitoring are complete | Continue checking delivery, freshness and coverage; preserve the stated recovery scope |
 | Weeks 2–3 | Workload-specific permissions, release identity, origin HTTPS and recovery procedures | Allowed/denied access tests, verified TLS origin, recoverable deployments and a timed restore |
 | Weeks 4–5 | Shared media, distributed limits, trusted client IP and retry-safe job ownership | Two-instance consistency, tenant isolation, forged-header and duplicate-job regressions |
 | Weeks 5–10 | Conditional RDS Multi-AZ, two-AZ ECS and load balancing; resolve shared-host dependencies | Compatible trial restore, single-writer cutover, measured recovery and a cost fit |
@@ -111,6 +149,16 @@ and an existing snapshot do not prove RDS compatibility or restoration.
 These are milestones, not a reason to delay preparation or deploy out of order.
 Later-phase designs, recovery procedures and acceptance gates are prepared now.
 The legacy root reconciliation remains separate from the applied foundation stack.
+
+The next changes are prepared and have passing CI, but remain **undeployed**:
+[managed HTTPS origin](https://github.com/JadenRazo/aws-infra/pull/12),
+[trusted portal client identity](https://github.com/JadenRazo/raizhost-app/pull/108),
+and [operations-host permissions](https://github.com/JadenRazo/aws-infra/pull/13).
+The required independent reviewer was unavailable after three launch attempts.
+The portal still uses its existing HTTP origin, and the operations host retains
+AdministratorAccess. Independent administrator recovery access was owner-confirmed;
+runtime permission testing and the final detach remain acceptance steps. Preserve
+these explicit limits until reviewed deployment and verification are complete.
 
 Backup regressions cover failed dumps/uploads, missing completion receipts,
 unknown media coverage, unsupported links, container replacement and overlapping
@@ -146,9 +194,10 @@ recovery and immutable retention are separate capabilities, not implied by Multi
 
 ## Operating evidence
 
-Proposed cadence: daily external health and backup coverage; weekly gross spend,
+The 15-minute backup monitor is an installed schedule. Additional proposed cadence:
+daily external health and backup coverage review; weekly gross spend,
 access findings and capacity; monthly isolated restoration and dependency review;
-quarterly scoped AZ/regional exercises. These are process targets, not new schedules.
+quarterly scoped AZ/regional exercises. Those additional processes are not new schedules.
 
 Each exercise records scope, impact, detection, last recoverable write, elapsed
 recovery, correctness, cost and follow-up ownership. Career evidence should show
