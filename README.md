@@ -20,12 +20,12 @@ Start with the map, then follow an application from a user action to its stored 
 | [llm.raizhost.com](https://llm.raizhost.com) | Follow provider releases, models, status, CLI references, and RSS feeds | Next.js web Lambda reads Postgres; separate scheduled Lambdas collect data | [LLM Tracker](docs/llm-raizhost-com.md) |
 | Client sites and [demos](https://demos.raizhost.com) | Visit a business website or review an example | Static files in S3 behind CloudFront | [Client delivery](docs/client-provisioning.md) |
 
-> **Cloud controls updated 2026-10-09.** Audit logging, encrypted storage defaults,
-> verified backups, independent backup alarms and table-deletion protection are live. September gross usage
-> was **$127.32**; the live gross budget is **$250/month across all AWS workloads**.
-> The serving topology remains single-AZ; automatic failover is a future milestone.
-> [Cloud operations](docs/cloud-operations.md) separates the operating baseline from the
-> target design. [Current evidence](docs/current-state.md) preserves each audit's scope.
+> **Cloud controls updated 2026-10-11.** Authenticated HTTPS portal origin,
+> audit/access logs, host telemetry and notification alarms are live. The gross
+> budget is **$250/month across all AWS workloads**. Operations database/configuration
+> recovery and portal application recovery passed; both hosts
+> remain in one AZ. [Cloud operations](docs/cloud-operations.md) explains installed
+> controls and limits; [current evidence](docs/current-state.md) records acceptance.
 
 ## Start with the action
 
@@ -56,6 +56,8 @@ Read each lane from left to right. Solid arrows show requests or data access; da
 show scheduled work or publication. CloudFront boxes represent separate distributions.
 Cloudflare supplies DNS answers; the browser's HTTPS connection goes to CloudFront.
 [Open the full-size diagram](diagrams/architecture.svg) to inspect its labels.
+The portal arrow summarizes CloudFront → authenticated HTTPS ALB origin → anchor;
+[request routing](docs/request-flow.md) explains that trust boundary.
 
 1. **Visit a website.** CloudFront serves cached HTML and assets, fetching from the site's
    private S3 origin when needed. A published client site can keep serving while the owner

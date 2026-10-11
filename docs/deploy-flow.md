@@ -76,8 +76,10 @@ health/rollback decisions and compares the guarantees of all three application w
 
 Terraform describes the original platform; CloudFormation owns the ephemeral runner factory;
 operations scripts provision client resources and emit import maps. The inspected
-infrastructure workflow keeps live Terraform plan/apply disabled while drift reconciliation
-is open. Its normal checks run without AWS identity.
+infrastructure workflow keeps live Terraform plan/apply disabled; its normal checks
+run without AWS identity. The October 11 operator-run root plan returned no actions
+after reviewed state-only reconciliation; this does not enable automatic apply.
+See [current evidence](current-state.md).
 
 Reconcile intended state against a current, reviewed live read before enabling mutation.
 Neither a diagram edit nor a passing documentation check authorizes an infrastructure apply.
