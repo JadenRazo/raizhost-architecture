@@ -38,6 +38,9 @@ jobs:
               -c /data/diagrams/mermaid-config.json -b white
           done
 
+      - name: Install diagram font metrics
+        run: pip install --quiet fonttools brotli
+
       - name: Check overview SVG and sketch match their shared graph
         run: python3 diagrams/overview.py --check
 
@@ -46,7 +49,6 @@ jobs:
 
       - name: Diagram geometry check (text fits boxes, no line crosses text)
         run: |
-          pip install --quiet fonttools brotli
           python3 diagrams/journeys.py --check
           python3 diagrams/journeys.py --self-test
           python3 diagrams/check.py
