@@ -51,7 +51,7 @@ A source-valid diagram can still be unreadable. Inspect the actual document imag
 With Docker, Python 3, and the geometry check's font dependencies installed:
 
 ```bash
-python3 -m pip install fonttools brotli
+python3 -m pip install --require-hashes --only-binary=:all: -r diagrams/requirements.txt
 diagrams/render.sh
 # Or rerender only changed Mermaid flows (deterministic generators still refresh):
 diagrams/render.sh request-flow deploy-flow ci-cd-flow

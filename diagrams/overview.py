@@ -122,6 +122,27 @@ def render_mermaid():
     return '\n'.join(parts) + '\n'
 
 
+def mobile_lane(canvas, title, ids, note, top, nodes, edges):
+    """Draw one lane, using only its existing shared-graph connectors."""
+    y = canvas.text(22, top, title, 356, 23, 600) + 12
+    for i, ident in enumerate(ids):
+        _, _, _, _, _, kind, lines = nodes[ident]
+        start, box_top = len(canvas.parts), y
+        y = canvas.text(36, y+16, lines[0], 328, 20, 600)
+        y = canvas.text(36, y+5, ". ".join(lines[1:]), 328, 18) + 16
+        fill, stroke = COLORS[kind]
+        canvas.parts.insert(start, f'<rect x="20" y="{box_top:g}" width="360" height="{y-box_top:g}" rx="8" fill="{fill}" stroke="{stroke}"/>')
+        if i+1 >= len(ids):
+            continue
+        edge = (ident, ids[i+1])
+        if edge in edges:
+            canvas.arrow(y+7, y+25)
+            if edges[edge]:
+                canvas.parts[-1] = canvas.parts[-1].replace('stroke-width="2"', 'stroke-width="2" stroke-dasharray="5 4"')
+        y += 34
+    return canvas.text(22, y+12, note, 356, 17) + 30
+
+
 def render_mobile():
     """Read the same graph by lane at phone width; no second topology source."""
     from journeys import Canvas, FONT_CSS, check_geometry
@@ -142,21 +163,7 @@ def render_mobile():
     if len(covered) != len(set(covered)) or set(covered) != set(nodes):
         raise ValueError("Mobile lanes must cover every shared node exactly once")
     for title, ids, note in rows:
-        y = canvas.text(22, y, title, 356, 23, 600) + 12
-        for i, ident in enumerate(ids):
-            _, _, _, _, _, kind, lines = nodes[ident]
-            start, top = len(canvas.parts), y
-            y = canvas.text(36, y+16, lines[0], 328, 20, 600)
-            y = canvas.text(36, y+5, ". ".join(lines[1:]), 328, 18) + 16
-            fill, stroke = COLORS[kind]
-            canvas.parts.insert(start, f'<rect x="20" y="{top:g}" width="360" height="{y-top:g}" rx="8" fill="{fill}" stroke="{stroke}"/>')
-            if i+1 < len(ids):
-                if (ident, ids[i+1]) in edges:
-                    canvas.arrow(y+7, y+25)
-                    if edges[(ident, ids[i+1])]:
-                        canvas.parts[-1] = canvas.parts[-1].replace('stroke-width="2"', 'stroke-width="2" stroke-dasharray="5 4"')
-                y += 34
-        y = canvas.text(22, y+12, note, 356, 17) + 30
+        y = mobile_lane(canvas, title, ids, note, y, nodes, edges)
     y = canvas.text(22, y, "Solid arrows: request or data access. Dashed arrows: publication. Read the companion guides for recovery and verification limits.", 356, 17) + 22
     issues = check_geometry(canvas.geometry)
     if issues:

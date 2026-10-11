@@ -39,7 +39,7 @@ jobs:
           done
 
       - name: Install diagram font metrics
-        run: pip install --quiet fonttools brotli
+        run: pip install --quiet --require-hashes --only-binary=:all: -r diagrams/requirements.txt
 
       - name: Check overview SVG and sketch match their shared graph
         run: python3 diagrams/overview.py --check
