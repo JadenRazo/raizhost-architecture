@@ -2,17 +2,19 @@
 
 [System overview](../README.md) · [Dated evidence](current-state.md) · [Decisions](decisions.md)
 
-**Evidence: October 8 foundations/recovery; October 9 monitoring and budget.** The live gross budget is **$250/month across
+**Evidence: October 11 origin/topology/alarms; October 8 foundations/recovery; October 11 budget.** The live gross budget is **$250/month across
 production, operations and learning workloads**. The design target reserves $25
 and allocates up to $225 to planned usage. The controls below have been deployed
-and checked; the two-AZ migration remains conditional on the readiness gates.
+and checked; the two-AZ application/database migration remains conditional on the readiness gates.
 
 ## What runs today
 
 Static sites retain the CloudFront/private-S3 serving path shown in the overview.
 Dynamic workloads use API Gateway/Lambda where suitable. The owner portal runs
 on a shared EC2 anchor with PostgreSQL, PgBouncer and Redis; private Lambda egress
-also depends on that host. An anchor failure can therefore affect editing,
+also depends on that host. The portal now reaches it through an HTTPS ALB with a
+private HTTP target hop. [Portal ingress](portal-ingress.md) and
+[failure domains](failure-domains.md) make these boundaries explicit. An anchor failure can affect editing,
 database consumers and external collection together.
 
 The anchor is a Graviton `t4g.medium`; the operations host is `t4g.large` with a
@@ -26,8 +28,8 @@ not provide automatic application or database failover across AZs.
 | Measurement | USD | Meaning |
 | :-- | --: | :-- |
 | September gross AWS usage | 127.32 | Excludes credits and refunds; read through Cost Explorer |
-| October gross forecast | 124.34 | Budget read October 9; point-in-time forecast, not a commitment |
-| October month-to-date | 29.10 | Estimated; budget data last updated October 8 at 23:40 UTC |
+| October gross forecast | 130.94 | Budget read October 11; updated October 10 at 22:28 UTC; not a commitment |
+| October 1–10 gross usage | 39.59 | Estimated and subject to billing lag; excludes credits/refunds |
 | Program ceiling | 250.00 | Total AWS spend including temporary migration overlap |
 | Planned usage target | 225.00 | Conditional on sizing and removing replaced costs |
 | Reserve | 25.00 | Buffer inside the ceiling, not an extra allowance |
@@ -47,9 +49,12 @@ Revisit costs if scope, event selection or retention changes. Sources:
 
 Independent backup monitoring adds a **$3/month planning allowance** for four
 custom metric series, two standard alarms, Lambda, requests and bounded logs.
-This is an allowance, not measured monthly spend or a service cap. No ALB, RDS or
-ECS capacity was added in the October 9 batch; the prepared HTTPS origin would
-add about $30/month for ALB hours, two public addresses and one average LCU.
+This is an allowance, not measured monthly spend or a service cap. The HTTPS ALB
+is now deployed, verified October 11. Its source runbook allows about $30/month for
+ALB hours, two public addresses and one average LCU; this is a planning estimate,
+not a measured full-month ALB bill. The latest forecast above includes only the
+usage AWS has processed; it does not establish the full-month effect of the rollout.
+RDS and ECS remain conditional targets.
 
 ## Deployed controls
 
@@ -74,7 +79,14 @@ delivered files for that completed interval, not a claim about all future logs.
 
 ## Independent backup monitoring
 
-EventBridge invokes a small ARM Lambda every **15 minutes**, outside the VPC and
+<p align="center">
+  <a href="../diagrams/backup-monitoring.svg"><picture>
+    <source media="(max-width: 600px)" srcset="../diagrams/backup-monitoring-mobile.svg">
+    <img src="../diagrams/backup-monitoring.svg" alt="An EventBridge scheduled rule invokes a Lambda outside the VPC every 15 minutes. It checks the latest database and media completion receipts in S3, reports health to CloudWatch and uses missing-data alarms with SNS actions. Separate nightly jobs produce the archives. Detection does not perform a restore." width="100%">
+  </picture></a>
+</p>
+
+An EventBridge **scheduled rule** invokes a small ARM Lambda every **15 minutes**, outside the VPC and
 independent of the anchor and its NAT function. It reads the newest completion
 receipt for each database/media stream and checks schema, coverage, timestamps,
 S3 versions, size and checksum metadata. A completed copy older than **26 hours**,
@@ -150,15 +162,18 @@ These are milestones, not a reason to delay preparation or deploy out of order.
 Later-phase designs, recovery procedures and acceptance gates are prepared now.
 The legacy root reconciliation remains separate from the applied foundation stack.
 
-The next changes are prepared and have passing CI, but remain **undeployed**:
-[managed HTTPS origin](https://github.com/JadenRazo/aws-infra/pull/12),
-[trusted portal client identity](https://github.com/JadenRazo/raizhost-app/pull/108),
-and [operations-host permissions](https://github.com/JadenRazo/aws-infra/pull/13).
-The required independent reviewer was unavailable after three launch attempts.
-The portal still uses its existing HTTP origin, and the operations host retains
-AdministratorAccess. Independent administrator recovery access was owner-confirmed;
-runtime permission testing and the final detach remain acceptance steps. Preserve
-these explicit limits until reviewed deployment and verification are complete.
+The October 11 configuration read supersedes the earlier TLS hold: the managed
+HTTPS ALB origin is active, one target is healthy and the old direct
+CloudFront-to-anchor port rule is absent. The viewer function is associated with
+all four portal behaviors. Current portal health matches the inspected application
+revision. These reads do not rerun the original forged-header or host-environment
+acceptance tests; see [portal ingress](portal-ingress.md).
+
+The operations-role reduction is **incomplete**: the scoped observation policy
+is installed, but AdministratorAccess and the SSM policy remain attached. Do not
+claim least privilege or assume that merging the source detached the old grant.
+Future changes still require independent review, effect authorization and runtime
+acceptance. [Diagram evidence](diagram-evidence.md) records the checks and limits.
 
 Backup regressions cover failed dumps/uploads, missing completion receipts,
 unknown media coverage, unsupported links, container replacement and overlapping

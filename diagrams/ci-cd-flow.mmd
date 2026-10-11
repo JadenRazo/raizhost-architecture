@@ -1,9 +1,10 @@
 flowchart TB
-  subgraph marketing["raizhost.com — manual production release"]
+  subgraph marketing["raizhost.com — live is the release branch"]
     direction TB
     mchange["PR or push<br/>main / staging"] --> mci["CI quality suite<br/>Build, contracts, browser checks"]
-    mci -. "Operator reviews evidence" .-> dispatch["Manual Deploy dispatch<br/>Full commit SHA<br/>approve_production = true"]
-    dispatch --> mcheck["Checkout equals requested SHA<br/>Run deployment checks"]
+    mci -. "Reviewed code promotion" .-> release["Push to live<br/>Code or owner content commit"]
+    dispatch["Manual Deploy dispatch on live<br/>Full SHA + approve_production"] --> mcheck["Checkout equals selected SHA<br/>SHA is ancestor of live<br/>Run deployment checks"]
+    release --> mcheck
     mcheck --> mship["OIDC role → S3 upload<br/>Request CDN invalidation"]
   end
 
@@ -25,5 +26,5 @@ flowchart TB
 
   classDef decision fill:#fff7ed,stroke:#c2410c,color:#172b35
   classDef output fill:#ecfdf5,stroke:#047857,color:#172b35
-  class dispatch,manual,pgate decision
+  class dispatch,release,manual,pgate decision
   class mship,pship,tship output

@@ -14,9 +14,9 @@ application user can change a particular website. Each has its own authority.
 | Application access | Server session, tenant/role, billing and content checks | Whether this user may read or change this site's data |
 
 Human approval is not a credential. A successful credential exchange is not evidence that
-someone approved a release. Marketing's dispatch includes an explicit production approval
-boolean, but its named `production` environment had **no reviewer, wait-timer, or branch
-protection rules** configured in the 2026-09-12 API read. The portal and tracker deploy jobs
+someone approved a release. Marketing deploys on `live` pushes; its optional manual dispatch includes a production
+approval boolean and a release-history check. The named `production` environment had
+**no reviewer, wait-timer, or branch protection rules** in the October 11 API read. The portal and tracker deploy jobs
 do not declare a GitHub environment gate. The [CI/CD guide](ci-cd.md) records their actual
 branch checks and triggering conditions.
 

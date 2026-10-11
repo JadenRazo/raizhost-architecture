@@ -7,17 +7,18 @@ The [owner walkthrough](owner-publishing.md) explains how that push is created. 
 covers changes to the marketing, portal and tracker applications themselves.
 
 CI checks proposed code. CD releases a selected revision. RaizHost's three main applications
-connect those stages differently: marketing requires a manual production dispatch, the
+connect those stages differently: marketing releases pushes to `live` or an approved
+dispatch on that branch, the
 portal publishes and deploys after successful push CI on main, and the tracker accepts
 either successful CI on main or a manual deployment dispatch.
 
 <p align="center">
-  <a href="../diagrams/ci-cd-flow.svg"><img src="../diagrams/ci-cd-flow.svg" alt="Three CI/CD lanes. Marketing CI supplies evidence for an operator who manually dispatches an exact commit with production approval; the deploy job checks that SHA and runs its own checks before S3. Portal build and end-to-end checks precede image publication on a push to main, and a same-repository successful push CI gates SSM deployment of its head SHA. Tracker successful CI on main or an independent manual dispatch selects the revision for its web image, assets, and three pollers." width="100%"></a>
+  <a href="../diagrams/ci-cd-flow.svg"><img src="../diagrams/ci-cd-flow.svg" alt="Three CI/CD lanes. Marketing CI supplies evidence for reviewed promotion to live; live pushes or an approved dispatch on live start deployment. The job binds the selected SHA to live history and runs checks before S3. Portal build and end-to-end checks precede image publication on a push to main, and a same-repository successful push CI gates SSM deployment of its head SHA. Tracker successful CI on main or an independent manual dispatch selects the revision for its web image, assets, and three pollers." width="100%"></a>
 </p>
 
 Read each lane downward. Solid arrows are workflow dependencies or triggers. The marketing
-dashed arrow is an **operator review step**: its Deploy workflow does not query a prior CI
-conclusion. [Open the diagram at full size](../diagrams/ci-cd-flow.svg).
+dashed arrow is an **operator code-promotion step**: its Deploy workflow does not query
+a prior CI conclusion. Owner content commits also push the configured `live` branch. [Open the diagram at full size](../diagrams/ci-cd-flow.svg).
 
 ## 1. Check the proposed change
 
@@ -37,7 +38,7 @@ revision; a main push may test a different merge revision.
 
 ## 2. Apply the actual merge gates
 
-These GitHub settings were read on **2026-09-12 UTC**, alongside the workflow source.
+These GitHub settings were re-read on **2026-10-11 UTC**, alongside the workflow source.
 Required checks are configured separately from checks that merely run.
 
 | Main branch | Required status checks | Required approving reviews |
@@ -51,20 +52,21 @@ All four inspected branch protections enforce their rules for administrators and
 conversation resolution. Their branch-rules API returned no additional active ruleset
 rules. A zero review count does not encode RaizHost's operational review and release
 authorization procedure. [Authorization](authorization.md) distinguishes that procedure
-from automated enforcement; [current state](current-state.md#github-gate-settings) records
+from automated enforcement; [diagram evidence](diagram-evidence.md) records
 how these settings were checked.
 
 ## 3. Select the release and its exact revision
 
 | Target | What permits the deploy job | Revision used |
 | :-- | :-- | :-- |
-| Marketing | Manual dispatch with `approve_production == true`; checkout must equal the supplied full `commit_sha` | Requested commit; deployment checks rerun before AWS credential setup |
+| Marketing | Push to `live`, or dispatch on `live` with `approve_production == true`; checkout must equal the selected SHA and be its release-branch ancestor | Push SHA or requested `commit_sha`; deployment checks rerun before AWS credentials |
 | Portal | CI conclusion is success, original event is push, head branch is main, and head repository matches | `workflow_run.head_sha`, whose image CI already pushed |
 | Tracker | Successful CI on main **or** manual Deploy dispatch | CI `head_sha`, or the dispatch's `github.sha` |
 
-Marketing merging to main does not deploy production. Its dispatch does not itself require
-the requested commit to be main or to have a green prior CI run. The operator must select
-the reviewed commit and assess the CI evidence.
+Marketing merging to main does not deploy production. Approved code must be promoted to
+`live`; owner content publication also writes that configured branch. Dispatch requires
+the `live` ref and a requested commit in its history. Neither path queries a prior CI
+conclusion, so the operator must assess the relevant evidence before code promotion.
 
 A portal main push can release production automatically, so authorize that effect before
 merging. Manually dispatching **portal CI** does not satisfy its push-only image/deploy

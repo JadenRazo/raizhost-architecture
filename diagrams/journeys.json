@@ -280,5 +280,102 @@
         "failed"
       ]
     ]
+  },
+  "portal-ingress": {
+    "title": "How a portal request reaches the anchor",
+    "subtitle": "Observed 11 October 2026. Transport and origin trust are separate from tenant authorization.",
+    "footer": "The ALB spans two zones. One application target and its database still share one zone.",
+    "stages": [
+      {
+        "actor": "BROWSER → CLOUDFRONT",
+        "title": "Connect over HTTPS",
+        "detail": "Cloudflare answers DNS. The browser connects to the portal distribution, which handles every portal path."
+      },
+      {
+        "actor": "CLOUDFRONT → ALB",
+        "title": "Use an authenticated HTTPS origin",
+        "detail": "CloudFront connects to the managed-certificate ALB over HTTPS. The origin-facing network rule and an origin credential restrict this path.",
+        "note": "The viewer function is attached to all four behaviors. Application source consumes trusted client identity only when its runtime flag is enabled."
+      },
+      {
+        "actor": "ALB → ANCHOR",
+        "title": "Forward to the one healthy target",
+        "detail": "The listener forwards matching origin requests to the anchor on private HTTP port 8083. The default listener action rejects other requests.",
+        "note": "TLS ends at the ALB. The target hop is not encrypted; the ALB does not add a second portal or database."
+      },
+      {
+        "actor": "PORTAL → DATA",
+        "title": "Authorize the owner action",
+        "detail": "Next.js checks the session, tenant, role and applicable billing/content rules before using the portal database or client repository.",
+        "note": "Local media, relational storage and the portal still depend on the anchor. Network origin trust does not replace these application checks."
+      }
+    ]
+  },
+  "backup-monitoring": {
+    "title": "From a missed backup to an alert",
+    "subtitle": "The backup producer and the monitor run independently. This path observes receipts, not restored data.",
+    "footer": "A healthy monitor is not a restore test, an inbox-delivery test or automatic failover.",
+    "stages": [
+      {
+        "actor": "EVENTBRIDGE SCHEDULED RULE",
+        "title": "Invoke every 15 minutes",
+        "detail": "An enabled EventBridge rule invokes the monitoring Lambda. This is separate from the EventBridge Scheduler jobs that collect tracker data."
+      },
+      {
+        "actor": "LAMBDA OUTSIDE THE VPC",
+        "title": "Inspect the latest completion receipts",
+        "detail": "Read database and media receipt metadata from S3 without connecting to the anchor or depending on its NAT.",
+        "note": "Separate nightly host jobs upload archives before writing completion receipts. They do not invoke this monitor."
+      },
+      {
+        "actor": "BACKUP VALIDATION",
+        "title": "Check freshness and archive metadata",
+        "detail": "Check coverage, timestamps, S3 version, size and checksum metadata. A copy older than 26 hours or an invalid newest receipt is unhealthy.",
+        "note": "The monitor does not download archives or try a restore. A newer bad receipt cannot be hidden by an older good one."
+      },
+      {
+        "actor": "CLOUDWATCH",
+        "title": "Evaluate each backup stream",
+        "detail": "Report health metrics. Two 15-minute alarm periods evaluate failure; missing data is treated as breaching. The monitor shares account Lambda concurrency.",
+        "note": "Evaluation and service delays prevent an exact detection-time promise."
+      },
+      {
+        "actor": "SNS → OPERATOR",
+        "title": "Investigate and repair",
+        "detail": "Enabled alarm actions target the operator topic. Inspect the newest receipt, monitor logs and producing job; repair the cause, then verify healthy checks.",
+        "note": "Recovery uses an authorized restore procedure. The October 8 isolated database rehearsal measured 7m11s total, not application recovery time."
+      }
+    ]
+  },
+  "failure-domains": {
+    "title": "What keeps working when a dependency fails?",
+    "subtitle": "Dependency map checked 11 October 2026. These are separate failure domains, not sequential steps.",
+    "flow": false,
+    "footer": "No automatic application or database failover was established. Backup detection and restore evidence have separate scopes.",
+    "stages": [
+      {
+        "actor": "STATIC DELIVERY",
+        "title": "Published pages have their own serving path",
+        "detail": "CloudFront reads private S3 output. A portal outage does not require already published static pages to go offline. Optional APIs may still fail."
+      },
+      {
+        "actor": "SHARED ANCHOR · ONE ZONE",
+        "title": "Editing, relational data and collection are coupled",
+        "detail": "The anchor hosts the portal, local media, PostgreSQL and PgBouncer, and supplies NAT for private Lambda egress. An outage can affect all of them.",
+        "note": "The two-zone portal ALB still has one anchor target. It cannot supply a healthy replacement application or database."
+      },
+      {
+        "actor": "OPERATIONS HOST · SAME ZONE",
+        "title": "Operations and other production workloads share a host",
+        "detail": "The separate operations instance is in the anchor zone and retains production dependencies. No stop/start schedules were returned in this read.",
+        "note": "A scoped observation policy is installed, but AdministratorAccess remains attached. Least-privilege removal is unfinished."
+      },
+      {
+        "actor": "BACKUP OBSERVATION · OUTSIDE THE VPC",
+        "title": "Detect failure independently of the anchor",
+        "detail": "An EventBridge rule invokes a non-VPC Lambda to inspect S3 backup receipts and emit CloudWatch metrics. Missing metrics can alarm even if the monitor stops.",
+        "note": "Same-account copies are not immutable or cross-region recovery. Detection does not restore data or start a replacement host."
+      }
+    ]
   }
 }

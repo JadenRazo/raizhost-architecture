@@ -13,8 +13,9 @@ server gates, GitHub, the client build and the publication result.
 ## The runtime
 
 The browser resolves `app.raizhost.com` through Cloudflare DNS and connects to CloudFront.
-CloudFront forwards portal requests to an always-on Next.js container running in Docker on
-the EC2 anchor. Postgres stores accounts, tenant membership, drafts, and publication records.
+CloudFront connects to an HTTPS ALB origin, which forwards over private HTTP to the
+always-on Next.js container on the EC2 anchor. The ALB spans two zones but has one
+application target. [Portal ingress](portal-ingress.md) diagrams transport and origin trust. Postgres stores accounts, tenant membership, drafts, and publication records.
 Better Auth handles authentication; server-side checks enforce membership, role, subscription,
 and permitted fields. An owner-facing control is only the interface to those checks.
 

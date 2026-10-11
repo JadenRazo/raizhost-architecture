@@ -13,7 +13,7 @@ flowchart LR
   quote_fn["Quote / CRM Lambdas<br/>Validate and authorize"]:::runtime
   ddb["DynamoDB<br/>Separate quote and CRM tables"]:::data
   owner["app.raizhost.com<br/>Owner signs in and edits"]:::source
-  app_cf["CloudFront<br/>Portal distribution"]:::edge
+  app_cf["CloudFront<br/>HTTPS → ALB"]:::edge
   portal["Next.js owner portal<br/>Docker on the EC2 anchor"]:::runtime
   editor_db["Portal Postgres database<br/>Accounts, drafts, publish records"]:::data
   reader["llm.raizhost.com<br/>Reader opens dashboard / RSS"]:::source

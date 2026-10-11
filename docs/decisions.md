@@ -52,6 +52,15 @@ CloudWatch monitoring rather than providing authoritative DNS in this design.
 DNS-only records must not be drawn as an extra HTTP proxy. Cache and authorization policy
 belong to the relevant distribution and application, not to a generic DNS box.
 
+## An HTTPS load balancer without an application failover claim
+
+The portal now uses a managed HTTPS origin with restricted network ingress and
+an origin credential. Its ALB spans two zones, but forwards over private HTTP to
+one anchor. This adds a managed transport boundary and a future target attachment
+point; it does not supply another application or database. The cost allowance and
+remaining recovery gates belong to [cloud operations](cloud-operations.md), and
+[portal ingress](portal-ingress.md) shows the actual hops.
+
 ## DynamoDB for inquiries and CRM
 
 Quote capture and CRM operations have separate HTTP APIs, Lambda functions, and DynamoDB
@@ -103,5 +112,6 @@ spending cap.
 The [October cloud operations record](cloud-operations.md) contains the measured
 September gross cost, current budget and conditional migration target. The first
 batch prioritizes auditability, reliable backups and demonstrated logical recovery
-without adding a new compute fleet. Two-AZ managed services come after application
+without adding a new compute fleet. A two-zone ALB now fronts the existing anchor. Multi-AZ application and database
+capacity still come after application
 state, database compatibility, dependency retirement and cost gates pass.

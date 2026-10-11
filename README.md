@@ -20,10 +20,13 @@ Start with the map, then follow an application from a user action to its stored 
 | [llm.raizhost.com](https://llm.raizhost.com) | Follow provider releases, models, status, CLI references, and RSS feeds | Next.js web Lambda reads Postgres; separate scheduled Lambdas collect data | [LLM Tracker](docs/llm-raizhost-com.md) |
 | Client sites and [demos](https://demos.raizhost.com) | Visit a business website or review an example | Static files in S3 behind CloudFront | [Client delivery](docs/client-provisioning.md) |
 
-> **Cloud controls updated 2026-10-09.** Audit logging, encrypted storage defaults,
+> **Serving paths checked 2026-10-11.** The portal now uses an HTTPS ALB origin;
+> the ALB still forwards to one anchor over private HTTP. The operations role still
+> retains AdministratorAccess. [Diagram evidence](docs/diagram-evidence.md) records the scope.
+> **Earlier accepted controls:** Audit logging, encrypted storage defaults,
 > verified backups, independent backup alarms and table-deletion protection are live. September gross usage
 > was **$127.32**; the live gross budget is **$250/month across all AWS workloads**.
-> The serving topology remains single-AZ; automatic failover is a future milestone.
+> The portal application and database remain in one AZ; automatic failover is a future milestone.
 > [Cloud operations](docs/cloud-operations.md) separates the operating baseline from the
 > target design. [Current evidence](docs/current-state.md) preserves each audit's scope.
 
@@ -37,6 +40,7 @@ Start with the map, then follow an application from a user action to its stored 
 | A visitor opens a page or submits an inquiry | [Request routing](docs/request-flow.md) and [website APIs](docs/raizhost-com.md) |
 | A provider releases an LLM update | [Scheduled collection → database → dashboard / RSS](docs/llm-raizhost-com.md) |
 | A new client needs hosting and owner access | [Provisioning and content-source connection](docs/client-provisioning.md) |
+| A host, backup or origin fails | [Failure domains](docs/failure-domains.md), [portal ingress](docs/portal-ingress.md) and [backup monitoring](docs/cloud-operations.md#independent-backup-monitoring) |
 | Infrastructure needs a cost, security or recovery change | [Cloud operations and staged resilience](docs/cloud-operations.md) |
 
 For example, **Publish in the owner portal** saves the latest draft, checks permission and
@@ -49,11 +53,16 @@ versus live branches, and what a green workflow can actually prove.
 ## The system at a glance
 
 <p align="center">
-  <a href="diagrams/architecture.svg"><img src="diagrams/architecture.svg" alt="RaizHost serving paths: browsers use CloudFront to reach static S3 websites, the owner portal on EC2, or LLM Tracker through API Gateway and Lambda. Quote and CRM browser requests call separate API Gateways directly. The portal and tracker use separate Postgres databases on the anchor. Scheduled pollers update tracker data. Owner publication commits to a client repository whose workflow deploys S3 files." width="100%"></a>
+  <a href="diagrams/architecture.svg"><picture>
+    <source media="(max-width: 600px)" srcset="diagrams/architecture-mobile.svg">
+    <img src="diagrams/architecture.svg" alt="RaizHost serving paths: browsers use CloudFront to reach static S3 websites, the owner portal through an HTTPS ALB and private HTTP to EC2, or LLM Tracker through API Gateway and Lambda. Quote and CRM browser requests call separate API Gateways directly. The portal and tracker use separate Postgres databases on the anchor. Scheduled pollers update tracker data. Owner publication commits to a client repository whose workflow deploys S3 files." width="100%">
+  </picture></a>
 </p>
 
-Read each lane from left to right. Solid arrows show requests or data access; dashed arrows
-show scheduled work or publication. CloudFront boxes represent separate distributions.
+Read desktop lanes from left to right; phone lanes stack vertically. Solid arrows show
+requests or data access; dashed arrows show scheduled work or publication. CloudFront
+boxes represent separate distributions. The portal lane groups CloudFront and its ALB
+origin; [portal ingress](docs/portal-ingress.md) expands the two transport hops.
 Cloudflare supplies DNS answers; the browser's HTTPS connection goes to CloudFront.
 [Open the full-size diagram](diagrams/architecture.svg) to inspect its labels.
 
@@ -63,8 +72,9 @@ Cloudflare supplies DNS answers; the browser's HTTPS connection goes to CloudFro
 2. **Submit an inquiry.** Browser code on raizhost.com calls a separate HTTP API Gateway.
    Its Lambda validates and stores the submission in DynamoDB, then attempts email through
    Resend. The saved inquiry and the email outcome are separate records of success.
-3. **Edit a client site.** CloudFront forwards authenticated portal requests to the Next.js
-   container on the anchor. Save writes a Postgres draft. Built Preview and Publish commit
+3. **Edit a client site.** CloudFront uses an HTTPS ALB origin, which forwards
+   over private HTTP to the Next.js container on the anchor. Save writes a Postgres draft.
+   Built Preview and Publish commit
    content to different client branches. The client workflow builds and deploys to the
    selected destination; the portal reconciles the exact content commit's workflow result.
    [Trace the owner-to-live path](docs/owner-publishing.md).

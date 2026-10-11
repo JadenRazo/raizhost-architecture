@@ -11,21 +11,22 @@ Start with [CI/CD](ci-cd.md) for the path from PR checks to release selection, a
 access. This page follows the artifacts after a release is selected.
 
 <p align="center">
-  <a href="../diagrams/deploy-flow.svg"><img src="../diagrams/deploy-flow.svg" alt="Marketing uses a manually approved exact-commit deployment to build Astro and upload S3 output. The owner app deploys the image built by successful push CI on main through ECR and SSM, with a container health check and rollback. LLM Tracker deploys its web image, static bundles, and three poller ZIPs after CI or a manual dispatch. Client content commits use each client repository's workflow." width="100%"></a>
+  <a href="../diagrams/deploy-flow.svg"><img src="../diagrams/deploy-flow.svg" alt="Marketing deploys a push to live or an approved dispatch on live, verifies the selected revision belongs to live history, and runs deployment checks to build Astro and upload S3 output. The owner app deploys the image built by successful push CI on main through ECR and SSM, with a container health check and rollback. LLM Tracker deploys its web image, static bundles, and three poller ZIPs after CI or a manual dispatch. Client content commits use each client repository's workflow." width="100%"></a>
 </p>
 
 ## The release paths are repository-specific
 
 | Target | Trigger in the inspected source | Artifacts and destination | Verification |
 | :-- | :-- | :-- | :-- |
-| `raizhost.com` | Manual dispatch with exact `commit_sha` and `approve_production` | Astro `dist/` → S3 → CloudFront invalidation | Revision binding and website checks in workflow; inspect live output after release |
+| `raizhost.com` | Push to `live`, or approved exact-SHA dispatch on `live`; SHA must belong to `live` history | Astro `dist/` → S3 → CloudFront invalidation | Revision binding and website checks in workflow; inspect live output after release |
 | `app.raizhost.com` | Successful same-repository **push CI on main** | CI-built ARM64 image → ECR → anchor via SSM | Additive migrations, health gate, rollback on rejected rollout, ops-file drift check |
 | `llm.raizhost.com` | Successful CI on main, or manual deployment dispatch | Web image → ECR/Lambda; static bundles → S3; shared ZIP → all three poller Lambdas | Lambda update results, tier invocations, CDN invalidation, live data and feed smoke checks |
 | Connected client website | Push to its configured live or preview branch | Site build → appropriate S3 root/prefix → invalidation | [Showers example](client-site-cicd.md): Action pins, unit tests, build, target HTTP HEAD; portal tracks the exact content run |
 | Quote and CRM APIs | Separate function deployment commands | Function ZIP/configuration → respective Lambda | Function-specific checks; not included in the static website deploy |
 
 This table describes triggers, not blanket permission to run them. An app main merge can
-release production automatically; a marketing main merge is not its production deploy.
+release production automatically; marketing deploys when changes reach `live`. A marketing
+main merge alone does not promote that code to `live`.
 
 ## Portal code release versus client content publication
 

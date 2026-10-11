@@ -1,5 +1,5 @@
 flowchart TB
-  marketing["Marketing<br/>Approved manual dispatch<br/>Exact commit SHA"]
+  marketing["Marketing<br/>Push to live; or approved dispatch on live<br/>Selected SHA must belong to live history"]
   portal["Portal<br/>Successful push CI on main<br/>Exact CI head SHA"]
   tracker["LLM Tracker<br/>Successful CI on main<br/>or manual dispatch"]
   client["Client site<br/>Content or code commit<br/>Live / preview branch"]

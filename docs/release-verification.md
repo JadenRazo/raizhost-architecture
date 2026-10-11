@@ -46,7 +46,7 @@ health pass alone does not verify every edge route or an owner's complete editin
 
 | Target | Automated gate in inspected source | What success does not establish |
 | :-- | :-- | :-- |
-| Marketing | Requested SHA binding, deployment checks, successful S3 commands and invalidation request | No invalidation-completion wait or post-upload live smoke check; operator acceptance must inspect served output |
+| Marketing | Selected SHA binding and ancestry in `live`, deployment checks, successful S3 commands and invalidation request | No invalidation-completion wait or post-upload live smoke check; operator acceptance must inspect served output |
 | Portal | Expected running image, container health, terminal SSM success | CDN invalidation is best effort; ops drift is warning-only; the script does not compare the public JSON SHA |
 | Tracker | Web/poller update status, scheduler-shaped invocations and tier-result assertions, invalidation completion, database response, page empty-state checks and RSS item presence | This does not prove every record is correct or that each source keeps its expected cadence after the release |
 | Connected client site | Its own workflow result for the content commit; Showers finishes with an HTTP HEAD smoke check | No exact-content assertion or invalidation wait in that example; an unavailable run lookup is not a confirmed failure. See [client CI/CD](client-site-cicd.md) and [publication status](publish-status.md) |

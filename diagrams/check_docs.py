@@ -15,7 +15,8 @@ DIAGRAMS = ROOT / "diagrams"
 PAIRS = {path.name: path.with_suffix(".svg").name
          for path in sorted(DIAGRAMS.glob("*.mmd"))}
 JOURNEYS = json.loads((DIAGRAMS / "journeys.json").read_text())
-MOBILE = {f"{name}-mobile.svg" for name in JOURNEYS}
+RESPONSIVE = set(JOURNEYS) | {"architecture"}
+MOBILE = {f"{name}-mobile.svg" for name in RESPONSIVE}
 OUTPUTS = set(PAIRS.values()) | MOBILE
 MANIFEST = DIAGRAMS / "rendered.sha256"
 issues: list[str] = []
@@ -93,7 +94,7 @@ for name in PAIRS.values():
             found = True
             if not re.search(r'alt="[^\"]+"', tag) or 'width="100%"' not in tag:
                 issues.append(f"{path.relative_to(ROOT)}: {name} needs alt text and width=\"100%\"")
-            if pathlib.Path(name).stem in JOURNEYS:
+            if pathlib.Path(name).stem in RESPONSIVE:
                 pictures = re.findall(r"<picture\b[^>]*>.*?</picture>", text, re.DOTALL)
                 mobile_name = pathlib.Path(name).stem + "-mobile.svg"
                 if not any(tag in picture and f'/{mobile_name}"' in picture
