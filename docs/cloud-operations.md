@@ -49,9 +49,9 @@ The older $100 budget is now also $250 gross. The $10 CodeBuild budget now filte
 the CodeBuild service on a gross basis. Subscribers were preserved. Notifications
 are delayed signals, not spending caps.
 
-The current planning allowance is **$211.80**: $165 base, $4.80 root expansion from
+The current planning allowance is $211.80: $165 base, $4.80 root expansion from
 other work, $7 monitoring, $3 retention, $5 drill and a conservative $27 for three
-full 180 GiB snapshots. Including the $25 reserve gives **$236.80**, below $250.
+full 180 GiB snapshots. Including the $25 reserve gives $236.80, below $250.
 These are planning allowances, not measured spend or enforceable caps. Recheck
 actual billing as logs, snapshots, retention and CI usage appear.
 
