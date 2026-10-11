@@ -83,8 +83,9 @@ Client content follows the [owner publication flow](owner-publishing.md), then
 [client CI/CD](client-site-cicd.md): the client repository owns its build and live/preview
 deployment checks. Do not infer those checks from portal CI.
 Quote/CRM functions have separate deployment commands. Infrastructure CI performs static
-validation without AWS identity; live Terraform plan/apply remains held pending drift
-reconciliation. Passing this architecture repository's documentation CI only validates docs.
+validation without AWS identity and does not automatically plan/apply live changes.
+The October 11 operator-run root plan returned no actions; that reconciliation
+does not enable CI mutation. See [current evidence](current-state.md). Passing this architecture repository's documentation CI only validates docs.
 
 **Source basis:** each application's `.github/workflows/ci.yml` and `deploy.yml`, infrastructure
 Terraform CI, and the dated GitHub settings in [current state](current-state.md).

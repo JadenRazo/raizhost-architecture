@@ -84,11 +84,13 @@ Terraform records the original core, CloudFormation owns the runner factory, and
 provisioning scripts produce import maps. Recorded out-of-band changes mean source is not
 proof of a drift-free account.
 
-Legacy-root Terraform automation remains held in the inspected workflow. Current inventory,
-a reviewed no-op reconciliation, and tested recovery are prerequisites to changing that
-operational posture. The October foundation stack uses its own state boundary and
-was applied only after ownership checks and a reviewed non-destructive plan; its
-post-apply plan showed no changes. This does not reconcile the legacy root.
+The October 11 root normal plan returned no actions after reviewed state-only
+reconciliation. CI remains static only, with live plan/apply disabled. A no-action
+plan is evidence at that read, not permission for future changes or proof of
+recovery. The October foundation stack retains its separate state boundary.
+CloudFormation still owns CodeBuild, with replacement/deletion denied by stack
+policy; original budget dates and subscribers were verified after the update in
+[current evidence](current-state.md).
 
 ## Cost reporting follows evidence
 
