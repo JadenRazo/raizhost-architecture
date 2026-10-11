@@ -8,6 +8,9 @@ links to the full-size diagram and explains the same stages in prose.
 
 | Diagram | Edit here | What it explains |
 | :-- | :-- | :-- |
+| Portal origin trust | [journeys.json](journeys.json) (`portal-ingress`) | HTTPS ALB, private HTTP target, tenant authorization and the single-host limit |
+| Backup observation | [journeys.json](journeys.json) (`backup-monitoring`) | Independent rule, receipt checks, alarms and operator recovery |
+| Failure domains | [journeys.json](journeys.json) (`failure-domains`) | Static delivery, anchor dependencies, operations host and independent detection |
 | System overview | [overview.py](overview.py) | Serving lanes, data boundaries, and owner publication |
 | Request routing | [request-flow.mmd](request-flow.mmd) | DNS versus HTTPS, origins, and direct browser APIs |
 | Code deployment | [deploy-flow.mmd](deploy-flow.mmd) | The distinct release trigger and artifact path for each repository |
@@ -23,20 +26,20 @@ links to the full-size diagram and explains the same stages in prose.
 | Portal rollout | [journeys.json](journeys.json) (`portal-rollout`) | Preparation, candidate health, eligible rollback, and recovery confirmation |
 
 The overview generator produces **both** `architecture.svg` and `architecture.mmd` from
-one set of nodes and edges. Its explicit layout keeps the main map readable while the
+one set of nodes and edges, including a narrow `architecture-mobile.svg`. Its explicit layout keeps the main map readable while the
 Mermaid sketch remains useful for inspecting topology. Do not edit either generated output
 by hand. `fonts.css` preserves the Inter subsets already embedded in the original diagram.
 
 ## Keep the reading path clear
 
-The six journey diagrams use [journeys.py](journeys.py) to render `journeys.json` into an
+The journey diagrams use [journeys.py](journeys.py) to render `journeys.json` into an
 SVG, a narrow `-mobile.svg` variant and a Mermaid sketch. Edit the JSON's actors, headings
 and descriptions; do not hand-edit generated outputs. Both SVG sizes contain the same facts.
 Stage headings and guide headings should describe the same handoffs in the same order.
 
 The SVG layout reserves the gaps between stages for short connectors. It measures wrapping
 with the embedded font, keeps explanations inside their stage, and places concurrent work
-or alternative outcomes together with an explicit label. Status cards are a reference,
+or alternative outcomes together with an explicit label. Status and failure-domain cards are references,
 not a sequence: their text lists possible next states; the Mermaid sketch preserves edges.
 
 Keep the diagram to the main path and consequential stop conditions. Put commands, retries
@@ -48,8 +51,10 @@ A source-valid diagram can still be unreadable. Inspect the actual document imag
 With Docker, Python 3, and the geometry check's font dependencies installed:
 
 ```bash
-python3 -m pip install fonttools brotli
+python3 -m pip install --require-hashes --only-binary=:all: -r diagrams/requirements.txt
 diagrams/render.sh
+# Or rerender only changed Mermaid flows (deterministic generators still refresh):
+diagrams/render.sh request-flow deploy-flow ci-cd-flow
 ```
 
 The renderer uses Mermaid CLI `11.4.2`, matching CI. For a local CLI installation of that
@@ -92,3 +97,6 @@ tables must explain the path without relying on tiny diagram labels.
 The overview's 16px headings and 14px node descriptions are checked by matching metrics in
 `check.py`. Update those metrics if the typography changes. Keep a meaningful geometry
 failure check when changing the generator or checker.
+
+See [diagram evidence](../docs/diagram-evidence.md) for each diagram’s source, scope
+and refresh trigger. Topology is sourced separately from geometry validation.

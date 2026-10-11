@@ -8,7 +8,8 @@ flowchart TB
   qfn --> ddb[("Separate DynamoDB tables")]
 
   cf -->|"website / demo / client files"| sites["Private S3 site origins<br/>OAC"]
-  cf -->|"app.raizhost.com"| portal["Next.js portal<br/>Docker on anchor"]
+  cf -->|"app: HTTPS + origin credential"| alb["Application Load Balancer<br/>Two AZs; one application target"]
+  alb -->|"private HTTP :8083"| portal["Next.js portal<br/>Docker on anchor; one AZ"]
   portal --> editorDb[("Portal Postgres database")]
   cf -->|"llm pages, cache miss"| api["HTTP API Gateway"]
   api --> web["Next.js web Lambda"]
@@ -18,5 +19,5 @@ flowchart TB
 
   classDef edge fill:#fff7ed,stroke:#c2410c,color:#172b35
   classDef data fill:#ecfdf5,stroke:#047857,color:#172b35
-  class dns,cf edge
+  class dns,cf,alb edge
   class sites,assets,ddb,editorDb,trackerDb data

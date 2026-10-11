@@ -5,6 +5,19 @@ repo_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 image="minlag/mermaid-cli@sha256:99c983b3ab4e14033f2880bc1b9de17e5090b4515dabd63fe9cf8c0ae6130956"
 names=(request-flow deploy-flow llm-data-flow ci-cd-flow
   preview-and-live client-site-cicd)
+if (( $# )); then
+  for requested in "$@"; do
+    found=false
+    for name in "${names[@]}"; do
+      [[ "$requested" != "$name" ]] || found=true
+    done
+    if [[ "$found" != true ]]; then
+      echo "Unknown Mermaid flow: $requested" >&2
+      exit 2
+    fi
+  done
+  names=("$@")
+fi
 
 python3 "${repo_root}/diagrams/overview.py"
 python3 "${repo_root}/diagrams/journeys.py"
@@ -26,7 +39,7 @@ for name in "${names[@]}"; do
   fi
 done
 
-python3 - "${repo_root}" <<'PY'
+python3 - "${repo_root}" "${names[@]}" <<'PY'
 from pathlib import Path
 import hashlib
 import re
@@ -42,6 +55,8 @@ titles = {
     "client-site-cicd": "Showers client website CI/CD pipeline",
 }
 for name, title in titles.items():
+    if name not in sys.argv[2:]:
+        continue
     path = root / "diagrams" / f"{name}.svg"
     svg = path.read_text()
     svg = re.sub(r'<style[^>]*>@import url\([^<]+</style>', "", svg)

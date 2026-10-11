@@ -1,114 +1,55 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 1190" role="img" aria-labelledby="title description">
-<title id="title">RaizHost: serving paths and owner publication</title>
-<desc id="description">Read each horizontal lane from browser to origin and data. Cloudflare provides DNS only. Static websites use S3 through CloudFront; quote and CRM APIs are called directly. The portal uses an HTTPS ALB origin and private HTTP to a single anchor target. LLM Tracker uses a web Lambda and separate scheduled pollers. Portal and tracker databases share the anchor. Owner publication commits to a client repository whose workflow builds the public site.</desc>
-<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#64748b"/></marker></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 1534.6" role="img" aria-labelledby="title description">
+<title id="title">From a missed backup to an alert</title>
+<desc id="description">The backup producer and the monitor run independently. This path observes receipts, not restored data. The companion guide explains each stage and exception.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#64748b"/></marker></defs>
 <style>@font-face{font-family:'Inter';font-weight:400;src:url(data:font/woff2;base64,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) format('woff2');}
 @font-face{font-family:'Inter';font-weight:600;src:url(data:font/woff2;base64,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) format('woff2');}
 
-text{font-family:Inter,sans-serif;fill:#172b35}.h{font-size:16px;font-weight:600}.s{font-size:14px;font-weight:400}.m,.lbl{font-size:12px;font-weight:400}.bandt{font-size:14px;font-weight:600;letter-spacing:.4px;text-transform:uppercase}.l,.ld{fill:none;stroke:#64748b;stroke-width:1.7;marker-end:url(#arrow)}.ld{stroke-dasharray:5 4}</style>
+text{font-family:Inter,sans-serif;font-kerning:none;font-variant-ligatures:none}</style>
 <rect width="100%" height="100%" fill="#ffffff"/>
-<text x="28" y="44" font-size="28" font-weight="600">RaizHost system</text>
-<text x="28" y="74" font-size="16">Application paths · source and scoped AWS routing checked 11 October 2026</text>
-<rect x="28" y="102" width="1064" height="74" rx="8" fill="#f8fafc" stroke="#cbd5e1"/>
-<text x="48" y="131" font-size="16" font-weight="600">DNS: Cloudflare resolves the hostname. HTTPS: the browser connects to CloudFront.</text>
-<text x="48" y="155" font-size="14">CloudFront boxes below are separate distributions. Origin arrows apply on a cache miss or revalidation.</text>
-<text x="28" y="218" class="bandt">01  Read a website</text>
-<text x="28" y="358" class="bandt">02  Submit or manage an inquiry</text>
-<text x="28" y="498" class="bandt">03  Use the owner portal</text>
-<text x="28" y="638" class="bandt">04  Read LLM updates</text>
-<text x="28" y="988" class="bandt">05  Build a preview or publish an owner&#x27;s update</text>
-<rect class="box source" x="28" y="234" width="236" height="80" rx="8" fill="#f8fafc" stroke="#64748b"/>
-<text x="146.0" y="269.0" class="h" text-anchor="middle">raizhost.com</text>
-<text x="146.0" y="290.0" class="s" text-anchor="middle">Client sites and demos</text>
-<rect class="box edge" x="304" y="234" width="188" height="80" rx="8" fill="#fff7ed" stroke="#c2410c"/>
-<text x="398.0" y="269.0" class="h" text-anchor="middle">CloudFront</text>
-<text x="398.0" y="290.0" class="s" text-anchor="middle">Website distribution</text>
-<rect class="box data" x="532" y="234" width="240" height="80" rx="8" fill="#ecfdf5" stroke="#047857"/>
-<text x="652.0" y="269.0" class="h" text-anchor="middle">Private S3 origin</text>
-<text x="652.0" y="290.0" class="s" text-anchor="middle">Built HTML and assets</text>
-<rect class="box source" x="28" y="374" width="236" height="80" rx="8" fill="#f8fafc" stroke="#64748b"/>
-<text x="146.0" y="409.0" class="h" text-anchor="middle">Marketing browser code</text>
-<text x="146.0" y="430.0" class="s" text-anchor="middle">Quote form / admin / CRM</text>
-<rect class="box runtime" x="304" y="374" width="188" height="80" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-<text x="398.0" y="409.0" class="h" text-anchor="middle">HTTP API Gateway</text>
-<text x="398.0" y="430.0" class="s" text-anchor="middle">Separate API origins</text>
-<rect class="box runtime" x="532" y="374" width="240" height="80" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-<text x="652.0" y="409.0" class="h" text-anchor="middle">Quote / CRM Lambdas</text>
-<text x="652.0" y="430.0" class="s" text-anchor="middle">Validate and authorize</text>
-<rect class="box data" x="812" y="374" width="280" height="80" rx="8" fill="#ecfdf5" stroke="#047857"/>
-<text x="952.0" y="409.0" class="h" text-anchor="middle">DynamoDB</text>
-<text x="952.0" y="430.0" class="s" text-anchor="middle">Separate quote and CRM tables</text>
-<rect class="box source" x="28" y="514" width="236" height="80" rx="8" fill="#f8fafc" stroke="#64748b"/>
-<text x="146.0" y="549.0" class="h" text-anchor="middle">app.raizhost.com</text>
-<text x="146.0" y="570.0" class="s" text-anchor="middle">Owner signs in and edits</text>
-<rect class="box edge" x="304" y="514" width="188" height="80" rx="8" fill="#fff7ed" stroke="#c2410c"/>
-<text x="398.0" y="549.0" class="h" text-anchor="middle">CloudFront</text>
-<text x="398.0" y="570.0" class="s" text-anchor="middle">HTTPS → ALB</text>
-<rect class="box runtime" x="532" y="514" width="240" height="80" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-<text x="652.0" y="549.0" class="h" text-anchor="middle">Next.js owner portal</text>
-<text x="652.0" y="570.0" class="s" text-anchor="middle">Docker on the EC2 anchor</text>
-<rect class="box data" x="812" y="514" width="280" height="80" rx="8" fill="#ecfdf5" stroke="#047857"/>
-<text x="952.0" y="549.0" class="h" text-anchor="middle">Portal Postgres database</text>
-<text x="952.0" y="570.0" class="s" text-anchor="middle">Accounts, drafts, publish records</text>
-<rect class="box source" x="28" y="654" width="236" height="80" rx="8" fill="#f8fafc" stroke="#64748b"/>
-<text x="146.0" y="689.0" class="h" text-anchor="middle">llm.raizhost.com</text>
-<text x="146.0" y="710.0" class="s" text-anchor="middle">Reader opens dashboard / RSS</text>
-<rect class="box edge" x="304" y="654" width="188" height="80" rx="8" fill="#fff7ed" stroke="#c2410c"/>
-<text x="398.0" y="689.0" class="h" text-anchor="middle">CloudFront</text>
-<text x="398.0" y="710.0" class="s" text-anchor="middle">Tracker distribution</text>
-<rect class="box runtime" x="532" y="654" width="240" height="80" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-<text x="652.0" y="689.0" class="h" text-anchor="middle">HTTP API → web Lambda</text>
-<text x="652.0" y="710.0" class="s" text-anchor="middle">Next.js + Lambda Web Adapter</text>
-<rect class="box data" x="812" y="654" width="280" height="80" rx="8" fill="#ecfdf5" stroke="#047857"/>
-<text x="952.0" y="689.0" class="h" text-anchor="middle">PgBouncer → Postgres</text>
-<text x="952.0" y="710.0" class="s" text-anchor="middle">Tracker database on anchor</text>
-<rect class="box data" x="304" y="792" width="188" height="80" rx="8" fill="#ecfdf5" stroke="#047857"/>
-<text x="398.0" y="827.0" class="h" text-anchor="middle">Private S3 assets</text>
-<text x="398.0" y="848.0" class="s" text-anchor="middle">/_next/static/*</text>
-<rect class="box runtime" x="812" y="792" width="280" height="80" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-<text x="952.0" y="816.5" class="h" text-anchor="middle">Scheduled poller Lambdas</text>
-<text x="952.0" y="837.5" class="s" text-anchor="middle">EventBridge invokes three tiers</text>
-<text x="952.0" y="858.5" class="s" text-anchor="middle">Fetch sources; normalize records</text>
-<rect class="box source" x="28" y="1004" width="236" height="90" rx="8" fill="#f8fafc" stroke="#64748b"/>
-<text x="146.0" y="1044.0" class="h" text-anchor="middle">Preview or Publish</text>
-<text x="146.0" y="1065.0" class="s" text-anchor="middle">Save + authorize + validate</text>
-<rect class="box source" x="304" y="1004" width="188" height="90" rx="8" fill="#f8fafc" stroke="#64748b"/>
-<text x="398.0" y="1033.5" class="h" text-anchor="middle">Client repository</text>
-<text x="398.0" y="1054.5" class="s" text-anchor="middle">Content JSON commit</text>
-<text x="398.0" y="1075.5" class="s" text-anchor="middle">Selected branch push</text>
-<rect class="box runtime" x="532" y="1004" width="240" height="90" rx="8" fill="#eff6ff" stroke="#2563eb"/>
-<text x="652.0" y="1044.0" class="h" text-anchor="middle">Client site workflow</text>
-<text x="652.0" y="1065.0" class="s" text-anchor="middle">Checks + build + AWS writes</text>
-<rect class="box data" x="812" y="1004" width="280" height="90" rx="8" fill="#ecfdf5" stroke="#047857"/>
-<text x="952.0" y="1044.0" class="h" text-anchor="middle">S3 + CloudFront</text>
-<text x="952.0" y="1065.0" class="s" text-anchor="middle">Preview prefix or public site</text>
-<path class="l" d="M264 274 L304 274"/>
-<path class="l" d="M492 274 L532 274"/>
-<path class="l" d="M264 414 L304 414"/>
-<path class="l" d="M492 414 L532 414"/>
-<path class="l" d="M772 414 L812 414"/>
-<path class="l" d="M264 554 L304 554"/>
-<path class="l" d="M492 554 L532 554"/>
-<path class="l" d="M772 554 L812 554"/>
-<path class="l" d="M264 694 L304 694"/>
-<path class="l" d="M492 694 L532 694"/>
-<path class="l" d="M772 694 L812 694"/>
-<path class="ld" d="M264 1049 L304 1049"/>
-<path class="ld" d="M492 1049 L532 1049"/>
-<path class="ld" d="M772 1049 L812 1049"/>
-<path class="l" d="M398 734 L398 792"/>
-<text x="410" y="769" class="lbl">hashed bundles</text>
-<path class="ld" d="M952 792 L952 734"/>
-<text x="964" y="769" class="lbl">writes</text>
-<text x="812" y="268" font-size="14">Visitors read built files.</text>
-<text x="812" y="291" font-size="14">The portal is outside this request path.</text>
-<text x="532" y="815" font-size="14">Web requests read stored data.</text>
-<text x="532" y="840" font-size="14">Scheduled workers collect updates.</text>
-<text x="28" y="924" font-size="14">ALB → portal uses private HTTP. Two ALB zones still lead to one anchor, its databases and local media.</text>
-<text x="28" y="948" font-size="14">Tracker workers also use anchor NAT. An anchor outage affects editing, database reads and collection.</text>
-<path class="l" d="M28 1136 L64 1136"/>
-<text x="76" y="1140" class="lbl">Request / data access</text>
-<path class="ld" d="M264 1136 L300 1136"/>
-<text x="312" y="1140" class="lbl">Scheduled work / publication</text>
-<text x="28" y="1170" font-size="12">Publication status: portal polls the exact client workflow run. Full path: docs/owner-publishing.md</text>
+<text x="28" y="52" font-size="32" font-weight="600" fill="#0f172a">From a missed backup to an alert</text>
+<text x="28" y="90.8" font-size="18" font-weight="400" fill="#1e293b">The backup producer and the monitor run independently. This path observes receipts, not</text>
+<text x="28" y="116" font-size="18" font-weight="400" fill="#1e293b">restored data.</text>
+<rect class="stage" x="24" y="147.2" width="792" height="170.2" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="48" y="185.2" font-size="14" font-weight="600" fill="#334155">EVENTBRIDGE SCHEDULED RULE</text>
+<text x="48" y="219.8" font-size="24" font-weight="600" fill="#0f172a">1. Invoke every 15 minutes</text>
+<text x="48" y="257.4" font-size="20" font-weight="400" fill="#1e293b">An enabled EventBridge rule invokes the monitoring Lambda. This is</text>
+<text x="48" y="285.4" font-size="20" font-weight="400" fill="#1e293b">separate from the EventBridge Scheduler jobs that collect tracker data.</text>
+<path class="connector" d="M420 325.4 V344.4" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect class="stage" x="24" y="353.4" width="792" height="249.8" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="48" y="391.4" font-size="14" font-weight="600" fill="#334155">LAMBDA OUTSIDE THE VPC</text>
+<text x="48" y="426" font-size="24" font-weight="600" fill="#0f172a">2. Inspect the latest completion receipts</text>
+<text x="48" y="463.6" font-size="20" font-weight="400" fill="#1e293b">Read database and media receipt metadata from S3 without connecting to</text>
+<text x="48" y="491.6" font-size="20" font-weight="400" fill="#1e293b">the anchor or depending on its NAT.</text>
+<rect x="48" y="511.6" width="744" height="67.6" rx="6" fill="#f8fafc"/>
+<text x="60" y="538.6" font-size="17" font-weight="400" fill="#334155">Separate nightly host jobs upload archives before writing completion receipts. They do</text>
+<text x="60" y="562.4" font-size="17" font-weight="400" fill="#334155">not invoke this monitor.</text>
+<path class="connector" d="M420 611.2 V630.2" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect class="stage" x="24" y="639.2" width="792" height="249.8" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="48" y="677.2" font-size="14" font-weight="600" fill="#334155">BACKUP VALIDATION</text>
+<text x="48" y="711.8" font-size="24" font-weight="600" fill="#0f172a">3. Check freshness and archive metadata</text>
+<text x="48" y="749.4" font-size="20" font-weight="400" fill="#1e293b">Check coverage, timestamps, S3 version, size and checksum metadata. A</text>
+<text x="48" y="777.4" font-size="20" font-weight="400" fill="#1e293b">copy older than 26 hours or an invalid newest receipt is unhealthy.</text>
+<rect x="48" y="797.4" width="744" height="67.6" rx="6" fill="#f8fafc"/>
+<text x="60" y="824.4" font-size="17" font-weight="400" fill="#334155">The monitor does not download archives or try a restore. A newer bad receipt cannot</text>
+<text x="60" y="848.2" font-size="17" font-weight="400" fill="#334155">be hidden by an older good one.</text>
+<path class="connector" d="M420 897 V916" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect class="stage" x="24" y="925" width="792" height="254" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="48" y="963" font-size="14" font-weight="600" fill="#334155">CLOUDWATCH</text>
+<text x="48" y="997.6" font-size="24" font-weight="600" fill="#0f172a">4. Evaluate each backup stream</text>
+<text x="48" y="1035.2" font-size="20" font-weight="400" fill="#1e293b">Report health metrics. Two 15-minute alarm periods evaluate failure; missing</text>
+<text x="48" y="1063.2" font-size="20" font-weight="400" fill="#1e293b">data is treated as breaching. The monitor shares account Lambda</text>
+<text x="48" y="1091.2" font-size="20" font-weight="400" fill="#1e293b">concurrency.</text>
+<rect x="48" y="1111.2" width="744" height="43.8" rx="6" fill="#f8fafc"/>
+<text x="60" y="1138.2" font-size="17" font-weight="400" fill="#334155">Evaluation and service delays prevent an exact detection-time promise.</text>
+<path class="connector" d="M420 1187 V1206" fill="none" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+<rect class="stage" x="24" y="1215" width="792" height="249.8" rx="8" fill="#ffffff" stroke="#cbd5e1"/>
+<text x="48" y="1253" font-size="14" font-weight="600" fill="#334155">SNS → OPERATOR</text>
+<text x="48" y="1287.6" font-size="24" font-weight="600" fill="#0f172a">5. Investigate and repair</text>
+<text x="48" y="1325.2" font-size="20" font-weight="400" fill="#1e293b">Enabled alarm actions target the operator topic. Inspect the newest receipt,</text>
+<text x="48" y="1353.2" font-size="20" font-weight="400" fill="#1e293b">monitor logs and producing job; repair the cause, then verify healthy checks.</text>
+<rect x="48" y="1373.2" width="744" height="67.6" rx="6" fill="#f8fafc"/>
+<text x="60" y="1400.2" font-size="17" font-weight="400" fill="#334155">Recovery uses an authorized restore procedure. The October 8 isolated database</text>
+<text x="60" y="1424" font-size="17" font-weight="400" fill="#334155">rehearsal measured 7m11s total, not application recovery time.</text>
+<text x="28" y="1503.8" font-size="17" font-weight="400" fill="#1e293b">A healthy monitor is not a restore test, an inbox-delivery test or automatic failover.</text>
 </svg>

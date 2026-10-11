@@ -46,7 +46,9 @@ noindexed and excluded from the public sitemap; API authorization provides the a
 
 ## Shipping a website change
 
-The current production workflow is manually dispatched with an exact reviewed commit SHA
+The production workflow runs on pushes to `live`, or an approved manual dispatch on that
+branch. It binds the selected SHA to `live` history and runs deployment checks. A main
+merge alone does not promote code to production. Manual dispatch takes an exact commit SHA
 and explicit production approval. It checks the revision, runs the site's validation, builds
 Astro, and assumes the scoped AWS deployment role through GitHub OIDC.
 

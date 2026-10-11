@@ -2,6 +2,27 @@
 
 [System overview](../README.md) · [Design decisions](decisions.md)
 
+## Diagram and origin refresh — October 11, 2026
+
+[The scoped evidence record](diagram-evidence.md) supersedes the older HTTP-origin
+and release-trigger descriptions. CloudFront now uses an HTTPS ALB origin; the
+ALB has one healthy anchor target and forwards to it over private HTTP. All four
+portal behaviors have the viewer function. Both EC2 hosts remain in one zone.
+
+The portal's public health and latest successful Deploy matched the inspected
+source revision with database up. Marketing source on `live` releases branch
+pushes or an approved dispatch with release-history validation. The operations
+role still has AdministratorAccess alongside its observation and SSM policies.
+The backup scheduled rule is enabled; both alarms report OK with actions enabled.
+The same-day billing read reports $39.59 estimated gross usage for October 1–10
+and a $130.94 forecast, updated October 10 at 22:28 UTC; the gross budget remains
+$250. These supersede the October 9 amounts only for the corresponding cost view.
+
+These are configuration, source and endpoint observations. No new restore,
+rollback, owner publication, notification delivery or origin attack test ran.
+The entries below preserve what was known at their stated times; their
+then-pending TLS work is no longer the current origin topology.
+
 ## Backup-monitoring follow-up — October 9, 2026
 
 The second accepted increment adds independent backup monitoring. This section
