@@ -2,6 +2,15 @@
 
 [System overview](../README.md) · [Design decisions](decisions.md)
 
+## Development admission recovery — October 21, 2026
+
+A reviewed owner operation closed a failed private lab while preserving its
+failed outcome and evidence. It proved resource settlement before releasing the
+original shared lock. Normal Business OS admission, isolated runtime validation
+and complete owned-resource closeout then succeeded.
+[The consolidated record](development-admission-recovery.md) describes the
+lifecycle repair, actual test scope, local delivery state and cost limits.
+
 ## Cloud-control reconciliation — October 11, 2026
 
 The October 11 batch reconciled Terraform with live resources, added bounded

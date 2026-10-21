@@ -180,6 +180,20 @@ connections. Keep that data retained and prove a separate snapshot or approved
 archive recovery before retiring its storage. Version availability, disk size
 and an existing snapshot do not prove RDS compatibility or restoration.
 
+## Shared development admission
+
+On October 21, an authorized owner recovery operation resolved a failed private
+lab that retained the shared build lock. Historical failure, current resource
+settlement and admission custody now have separate dispositions. Unknown writers
+or resources keep custody; a timeout never means automatic release.
+
+Business OS validation then used the normal runner and a dedicated bounded
+boundary on the existing operations host. It passed the core database and
+fixture-browser gates and settled its private resources. This establishes a
+development execution path, not production hosting or authenticated application
+readiness. [Recovery and validation evidence](development-admission-recovery.md)
+records the demonstrated controls, retained artifacts and unmeasured cost limits.
+
 ## Milestones and remaining work
 
 | Milestone | Work | Evidence required for completion |
