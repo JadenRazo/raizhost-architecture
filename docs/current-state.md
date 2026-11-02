@@ -2,6 +2,73 @@
 
 [System overview](../README.md) · [Design decisions](decisions.md)
 
+## Operational repairs — November 1, 2026
+
+New task-specific authorization covered the portfolio repairs excluded from the
+October batch. Scoped production changes restored Redis authorization, replaced
+the daily-summary executable and event contract, and added outcome monitoring.
+Work and verification continued overnight into November 2.
+Private source revisions, artifact hashes, request identities and rollback
+receipts remain in the operations incident record. No legacy-root infrastructure
+apply, capacity increase, historical bulk backfill or unrelated service restart ran.
+
+| Observation in UTC | Result and limit |
+| :-- | :-- |
+| Redis recovery at 22:16; independent checks at 22:18 | The intended API user authenticates with its existing credential; permissions and other users were preserved. The same Redis image was recreated with an ACL file on its persistent mount. Isolated two-generation recreation tests also passed. |
+| Portfolio API reads November 1 at 22:19/22:53 and November 2 at 00:07 | All three returned healthy with the database connected; delivered metadata correlated the later reads to successful cold-started handlers. This validates the repaired initialization path, not every historical business operation. |
+| Summary replacement deployed at 22:19; bounded invocation at 22:20 | The October 31 summary committed once and independently matched source counts/maps. Serialization, read errors, empty days, atomic upsert and intended-date handling have regression coverage. The old dirty build source was incomplete; this is a deliberately reconstructed daily-only replacement. |
+| Natural summary, November 2 at 00:05:25 | The November 1 report committed on the repaired source. An independent 00:07 database read verified exactly one row and matching counts, average and all four maps. This was an empty day; populated days and delayed/duplicate delivery were tested locally. |
+| Lambda metrics, November 1 22:18–November 2 00:09 exclusive | API: three invocations, zero errors/throttles. Summary: two invocations, zero errors/throttles. Quiet intervals alone are not recovery evidence. |
+| Independent summary monitor through November 2 00:09 | All 103 available one-minute samples confirmed the expected committed date. The existing host timer checks the database independently of the job; missing samples breach the new alarm. |
+| API diagnostic logging enabled at 22:52 | Seven-day metadata-only records were delivered for both portfolio and tracker; request and integration IDs correlate handler outcomes. Routes remain the existing default route, so these records do not reconstruct application paths. |
+| Budget routing changed at 22:52 | Both native email recipients remain on all five notifications. Their duplicate SNS delivery path was removed; thresholds, the gross budget and operational SNS routing remain unchanged. Future genuine notification delivery is pending. |
+| Tracker routing deployed November 1 at 23:16; reads at 23:21 | Unknown and dotted paths returned real 404 documents with the intended cache policy; a known article and DB-backed health still worked. From 23:18–November 2 00:09, 1,683 accepted executions had zero errors/throttles and maximum concurrency seven. This does not validate comparable-burst recovery; no quota changed. |
+| Tracker ingestion, November 2 at 00:05–00:09 | The corrected bounded fetch committed ten new link-only releases and its page validators. Final health reported database up and all 29 sources current without failures. |
+| Portal workflow deployment, November 1 at 23:57 | All four jobs ran Node 22 before passing workflow guards. Public health returned the merged release and database up; Redis, PostgreSQL and PgBouncer containers were unchanged. |
+
+The next natural summary window is **November 3, 00:05–00:10 UTC**, reporting
+November 2. That future run is unobserved; November 2's run is verified above.
+The overdue monitor changes
+its expected date at 00:20, allowing the normal schedule, execution time and
+execution retries; three failing one-minute samples then alert, subject to
+ingestion delay. Prolonged delivery delays remain visible as overdue work.
+
+The tracker throttle bursts reached the regional concurrency quota. October 29
+origin 5xx counts aligned with throttled attempts, supporting a relationship to
+the CloudFront incident. Historical callers remain unknown. The routing repair in
+[PR 18](https://github.com/JadenRazo/llm-tracker/pull/18) removes reproduced
+static-fallback errors and soft 404s. Newer accepted provider/parser work was
+preserved; the existing frontier gate passed before deployment. A separate
+Codex release-ingestion failure exceeded the response body cap. Its bounded
+pagination repair in [PR 19](https://github.com/JadenRazo/llm-tracker/pull/19)
+preserves the twenty-release scope, cap and committed per-page validators;
+its first production verification exposed an insufficient per-page deadline.
+[PR 20](https://github.com/JadenRazo/llm-tracker/pull/20) replaced that with one
+shared twenty-second HTTP budget, retaining four pages and zero HTTP retries.
+The final deployed source committed successfully. The failed intermediate run
+made no partial writes. No accepted state or infrastructure capacity limit was
+changed to pass a gate. The post-routing maximum request duration was about
+9.92 seconds; lower concurrency and absent throttles do not prove every request
+is fast or establish recovery under the historical burst.
+
+Root and data-disk signals still monitor the same root filesystem. The attached
+data volume is unmounted; no data migration or cleanup ran. Current usage was
+about 62.4%; the cause of the earlier 96.5% peak and subsequent reduction remains
+unproven. October privileged-IAM events matched documented disposable lab runs.
+The portal's Node setup correction passed local Node 22 checks, protected CI and
+deployment. A main-branch unit run
+hit two focus assertions in unchanged UI tests; one failed-build-only rerun passed.
+That intermittent test cause remains unresolved. Actual task-related CodeBuild
+runtimes imply about **$0.39 compute**, before small log/artifact storage, within
+the existing allowance; posted incremental charges are not established.
+Portfolio and infrastructure source commits are preserved privately and remain
+local/unmerged; their adoption must precede an unrelated rebuild of those paths.
+Remaining IAM and independent-backup work from the
+October batch is unchanged.
+
+[Cloud operations](cloud-operations.md#portfolio-outcomes-and-request-diagnostics)
+describes the new monitoring, cost allowance and recovery boundaries.
+
 ## Cloud-control reconciliation — October 11, 2026
 
 The October 11 batch reconciled Terraform with live resources, added bounded
@@ -48,9 +115,10 @@ PITR, disabled retained-database recovery, snapshot restoration or infrastructur
 failover. The October 8 **7m11s database-only restore** below remains historical
 evidence; it is distinct from the October 11 application rehearsal.
 
-The owner selected recommendations 4–8. Operations AdministratorAccess removal,
-failing portfolio Lambda repairs and independently protected backups (1–3) remain
-excluded and unresolved. IAM Access Analyzer findings remain open. Scoped backup
+The October batch selected recommendations 4–8. Operations AdministratorAccess removal,
+portfolio Lambda repairs and independently protected backups (1–3) were excluded
+from that batch. The November 1 section records newly authorized portfolio repairs;
+IAM and independently protected backups remain unresolved. IAM Access Analyzer findings remain open. Scoped backup
 permissions do not reduce an attached administrator policy.
 
 ## Backup-monitoring follow-up — October 9, 2026

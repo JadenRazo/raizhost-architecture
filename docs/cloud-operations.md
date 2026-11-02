@@ -2,12 +2,14 @@
 
 [System overview](../README.md) · [Dated evidence](current-state.md) · [Decisions](decisions.md)
 
-**Verified controls: October 11, 2026.** The gross budget is **$250/month across
+**Base controls verified October 11; scoped repairs verified November 1–2, 2026.** The gross budget is **$250/month across
 all AWS workloads**, with $225 planned usage and a $25 reserve. Logging, monitoring,
 origin protection and storage controls are live. Operations-host database/configuration recovery and the portal real-backup
 restore passed; the daily operations backup timer is enabled.
 [The consolidated evidence record](current-state.md#cloud-control-reconciliation--october-11-2026)
 records accepted controls, remaining checks and earlier recovery history.
+The [November repair record](current-state.md#operational-repairs--november-1-2026)
+separates verified portfolio recovery from pending comparable-burst tracker validation.
 
 ## What runs today
 
@@ -46,7 +48,9 @@ removed. Shared data and ECR images remain retained.
 
 The program budget alerts at **$200, $225 and $250 actual**, plus **$225 forecast**.
 The older $100 budget is now also $250 gross. The $10 CodeBuild budget now filters
-the CodeBuild service on a gross basis. Subscribers were preserved. Notifications
+the CodeBuild service on a gross basis. On November 1, the older budget's duplicate
+SNS route was removed after confirming both recipients also receive its native
+email notifications. All five thresholds and native recipients remain. Notifications
 are delayed signals, not spending caps.
 
 The current planning allowance is $211.80: $165 base, $4.80 root expansion from
@@ -115,12 +119,54 @@ are **11 operational and three security alarms with actions enabled**. They noti
 through SNS; the existing EC2 auto-recover/reboot actions are the
 exception and remain preserved. New alarms do not provide application failover.
 
+The quoted alarm counts describe the October batch. November added one separate
+daily-summary outcome alarm; existing error thresholds and recovery actions remain.
+
 A real operations-host heartbeat pause exercised `FILL(heartbeat, 0)` with three
 of three periods below one. It entered ALARM after **210.6 seconds** and returned
 to OK after reporting resumed; applications were untouched. A separate CloudWatch
 SNS provider test reported successful action status. **Human inbox receipt is not
 confirmed.** Inspect telemetry and the affected service when notified; an OK
 heartbeat alone does not prove application health.
+
+## Portfolio outcomes and request diagnostics
+
+The daily summary now uses the intended UTC scheduled time to select its reporting
+date. Retries keep that date, including after midnight. It rejects missing or
+unsupported event contracts visibly and records completion only after the
+date-keyed upsert commits. A successful invocation request is not completion.
+The bounded October 31 write and November 2 natural run for November 1 both
+committed and independently matched their source intervals. Both were empty
+days; populated-day and delayed/retry behavior have focused database coverage.
+
+The existing one-minute anchor telemetry timer independently checks that the
+expected summary row exists. From 00:20 UTC it requires yesterday's date; before
+then it requires the preceding date. Query errors and missing reporting are
+failures. Three of three one-minute periods below one alert through the existing
+operator topic. Recovery means the expected committed row was observed, whereas
+the sparse Lambda Errors alarm becoming OK only means its threshold is no longer
+breaching. Neither signal proves every report field is correct; bounded output
+comparison remains part of release acceptance.
+
+Portfolio and tracker API Gateways now emit request/integration IDs, route keys,
+method, status, timing and response length to seven-day log groups. They omit
+bodies, IP addresses, credentials, query strings and raw application paths. The
+existing default routes remain, so request-to-handler correlation is available
+without claiming path-level historical attribution. A dashboard widget groups
+throttles by function using the existing aggregate alarm's exclusions.
+
+The new completion metric/alarm is estimated at about **$0.40/month**. At the
+observed request volume, bounded access logging adds roughly **$0.21/month** plus
+small seven-day storage. These fit the existing $7 monitoring allowance; they are
+estimates, not posted charges or a reason to rely on free credits. No new timer,
+monitoring compute, concurrency reservation or regional quota was added.
+
+Recovery preserves separate boundaries: reverting executable code does not undo
+committed summaries; Redis rollback preserves other users and uses the captured
+same-image configuration; logging rollback restores only the recorded stage and
+dashboard settings. Retained pre-repair portfolio artifacts are known failing,
+not healthy fallback releases. Detailed revision guards and private recovery
+material belong in the owning repositories and incident record.
 
 ## Backup coverage and demonstrated recovery
 
@@ -200,9 +246,10 @@ owned, with source ownership preserved and a stack policy denying replacement or
 deletion. The final budget update preserved its original dates, settings and subscribers.
 The infrastructure change link is recorded in the dated evidence.
 
-The approved scope covered batches 4–8. **Explicitly excluded and unresolved** are
-operations-host AdministratorAccess removal, failing portfolio Lambdas, and
-independently protected backups (batches 1–3). The IAM Access Analyzer findings
+The October approved scope covered batches 4–8. November's task-specific approval
+subsequently covered portfolio repairs, as recorded above. Operations-host
+AdministratorAccess removal and independently protected backups remain unresolved.
+The IAM Access Analyzer findings
 remain open. Scoped backup permissions do not remove AdministratorAccess, and
 versioning/retention do not establish independent or immutable backup protection.
 

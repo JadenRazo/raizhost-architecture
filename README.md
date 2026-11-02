@@ -27,6 +27,11 @@ Start with the map, then follow an application from a user action to its stored 
 > remain in one AZ. [Cloud operations](docs/cloud-operations.md) explains installed
 > controls and limits; [current evidence](docs/current-state.md) records acceptance.
 
+**November 1–2 operational update:** portfolio dependency recovery and the natural
+daily-summary run passed. Outcome monitoring, request diagnostics and tracker
+ingestion repairs are live. Comparable-burst throttle recovery remains unverified.
+[Repair evidence and limits](docs/current-state.md#operational-repairs--november-1-2026).
+
 ## Start with the action
 
 | What happened? | Follow this path |
