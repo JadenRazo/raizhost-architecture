@@ -19,12 +19,16 @@ on a shared EC2 anchor with PostgreSQL, PgBouncer and Redis; private Lambda egre
 also depends on that host. An anchor failure can therefore affect editing,
 database consumers and external collection together.
 
-The anchor is a Graviton `t4g.medium`; the operations host is `t4g.large` with a
-180 GiB encrypted root volume. Both are in one Availability Zone. The operations host still
+The anchor is a Graviton `t4g.medium`; the operations host is `t4g.large` with an
+encrypted root volume, 232 GiB since November 9 (180 GiB at the October batch).
+Both are in one Availability Zone. The operations host still
 runs production workloads, so it cannot be scheduled off as a cost optimization
 until those dependencies have been moved and verified. Current EC2 topology does
-not provide automatic application or database failover across AZs. The anchor's
-root still holds its data; its attached 60 GiB volume is unformatted and unused.
+not provide automatic application or database failover across AZs. Since November 14,
+2026 the anchor's PostgreSQL data lives on its attached 60 GiB volume. The host
+mounts that volume before the database starts, and the database container
+refuses to start on any other storage. The root disk no longer holds live
+database files; a stale pre-move copy remains there until its removal is approved.
 
 Portal requests use CloudFront → authenticated HTTPS ALB origin → anchor container,
 with trusted viewer-IP handling. This was accepted before the October 11 batch;
@@ -122,6 +126,10 @@ exception and remain preserved. New alarms do not provide application failover.
 The quoted alarm counts describe the October batch. November added one separate
 daily-summary outcome alarm; existing error thresholds and recovery actions remain.
 
+Until November 14 the anchor's root and data-disk signals both measured the root
+filesystem. The data-disk signal now measures the database volume; its alarm and
+threshold are unchanged.
+
 A real operations-host heartbeat pause exercised `FILL(heartbeat, 0)` with three
 of three periods below one. It entered ALARM after **210.6 seconds** and returned
 to OK after reporting resumed; applications were untouched. A separate CloudWatch
@@ -192,6 +200,17 @@ removed. Production was not a restore target. This is application API and local
 publish acceptance, not customer publication, PITR, snapshot restoration or
 host/AZ/regional failover. Daily backups imply up to roughly a day of data loss
 when successful; this measured rehearsal is not a recovery-time commitment.
+
+The November 14 storage move was rehearsed first on disposable resources: a
+restore of the latest real backups, a forward copy, a reverse copy that kept a
+write made after the forward step, and a container-runtime restart with the
+device absent. The move itself then ran once in production with a full checksum
+comparison before the database reopened. That demonstrates the copy and its
+reversal. It is not snapshot restoration, PITR or host/AZ failover. The existing
+daily snapshot policy covers the data volume; its first non-empty snapshot and
+the first nightly logical backup after the move were still pending when this was
+written. [Current state](current-state.md#database-storage-move--november-14-2026)
+holds the dated observations.
 
 ## Historical recovery evidence — October 8
 

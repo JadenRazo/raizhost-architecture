@@ -2,6 +2,54 @@
 
 [System overview](../README.md) · [Design decisions](decisions.md)
 
+## Database storage move — November 14, 2026
+
+The anchor's PostgreSQL data now lives on the host's dedicated data volume
+instead of its root disk. One maintenance window on November 14 moved it. The
+database was unavailable for about three and a half minutes, no rollback was
+needed and no acknowledged write was lost.
+Private resource identities, script revisions, review verdicts and receipts
+remain in the operations record
+([operations PR 15](https://github.com/JadenRazo/raizhost-operations/pull/15)).
+No reboot, routing change, capacity increase or Lambda change was part of the move.
+
+| Observation in UTC | Result and limit |
+| :-- | :-- |
+| Isolated rehearsals before the window | A restore of the latest real backups, a forward and a reverse copy with a surviving post-cutover write, and a container-runtime restart with the device absent all passed on disposable resources using the final scripts. Rehearsal hardware differs from the anchor; copy timing on the anchor was measured separately during the online seed. |
+| Root protection snapshot completed at 20:09 | Taken before any change to the anchor. It protects the pre-move root; restoring from it was not exercised. |
+| Online seed, 20:25–20:30 | The blank volume was formatted once and seeded while the database kept serving from root. No interruption. |
+| Maintenance window, 20:39:05–20:42:53 | Scheduled jobs and application deployments were paused and then restored to their recorded states. Database serving resumed at 20:42:37. The portal health endpoint returned 502 from 20:39:17 to 20:42:29; a probed client site and the LLM Tracker health endpoint stayed available. |
+| Copy verification inside the window | After a clean shutdown, a final delta copy and a full checksum comparison of both trees found no difference, and control data matched. PostgreSQL then started on the new volume without recovery. Database list, roles, extensions and per-database sizes were identical before and after. |
+| Checks at 20:43–20:49 | Collectors that need both private egress and the database ran with zero errors. Database and pooler logs since the restart held no warnings. Three alarms fired because of the window and every alarm then returned to OK. Unrelated services on both hosts kept their start times. |
+| Data-disk signal corrected at 21:08 | The data-disk measurement had read the root filesystem. It now reads the database volume, about 22% used, under the same alarm. Root usage is reported separately, about 60%. |
+
+The database container now starts only when the expected filesystem is mounted.
+Its storage is bound to the filesystem identity instead of a host path, a start
+guard refuses any other storage, and the former path is fenced so a stale
+configuration fails instead of creating an empty database on root.
+The copy of the old data directory kept on root is stale from the moment of
+cutover and is not a rollback target. Returning to root would need a
+write-preserving reverse copy and a new interruption.
+
+Journals are size- and age-bounded on both hosts, and the database and pooler
+containers have bounded logs. A November 14 spike of root usage to 98% was traced
+to temporary-file spill from one retired workload's query. That workload's
+function is stopped and its database has a temporary-file cap. The cause of the
+earlier 96.5% peak recorded below remains unproven.
+
+Still unverified at the time of writing: the first non-empty scheduled snapshot of
+the data volume and the first nightly logical backup after the move.
+Infrastructure source does not yet describe the new mount, start guard or
+container configuration; that must be reconciled before the anchor is rebuilt
+from source. The move adds no failover: both hosts remain in one Availability
+Zone and the anchor still carries the portal, database, cache and private egress
+together. Estimated added recurring cost is about **$4 per month**, with a
+planning maximum under $6, mostly the larger operations volume and data-volume
+snapshots; posted charges are not yet established.
+
+[Cloud operations](cloud-operations.md#what-runs-today) describes the resulting
+layout and recovery boundaries.
+
 ## Operational repairs — November 1, 2026
 
 New task-specific authorization covered the portfolio repairs excluded from the
